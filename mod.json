@@ -1,12 +1,11 @@
 {
-	"modname": "Corrupted Extended",
-	"moddesc": "Corrupted enemies that tries to catch you.",
+	"modname": "Corrupted Expanded",
+	"moddesc": "Corrupted enemies that tries to encase you in.",
 	"author": "Matsuo / fix by DeadFinder",
-	"modbuild": "0.4.0",
+	"modbuild": "0.3.6",
 	"gamemajor": 5,
 	"gameminor": 4,
 	"gamepatch_min": 32,
 	"gamepatch_max": -1,
-	"priority": 90,
-	"fileorder": ["corruptedFunctions.ks", "corruptedRestraints.ks", "corruptedFaction.ks", "corruptedOutfits.ks", "corruptedModels.ks", "corruptedEnemies.ks"]
+	"priority": 90
 }
