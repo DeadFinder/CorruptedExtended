@@ -56,19 +56,19 @@ KinkyDungeonEnemies.push({
         profile: ["alchemist"]
     },
     events: [
-        {trigger: "afterDamageEnemy", type: "bleedEffectTile", kind: "LatexThin", aoe: 1.5, power: 3, chance: 1.0, duration: 20},
-        {trigger: "beforeDamage", type: alchemistDomFlag},
-        {trigger: "afterEnemyTick", type: alchemistDomRefreshFlag}
+        { trigger: "afterDamageEnemy", type: "bleedEffectTile", kind: "LatexThin", aoe: 1.5, power: 3, chance: 1.0, duration: 20 },
+        { trigger: "beforeDamage", type: alchemistDomFlag },
+        { trigger: "afterEnemyTick", type: alchemistDomRefreshFlag }
     ],
     ignoreflag: [alchemistDommedFlag], failAttackflag: [alchemistDommedFlag],
     stamina: 4,
     visionRadius: 6, maxhp: 20, minLevel: 0, weight: -20, movePoints: 2, attackPoints: 3, attack: "SpellMeleeBindLock",
     attackWidth: 3, attackRange: 1, power: 1, dmgType: "grope", fullBoundBonus: 2,
-    terrainTags: {"secondhalf": 5, "lastthird": 5, "miniboss": 10, "latexAnger": 6, "latexRage": 10, "latexPleased": 2, "latexFriendly": 4, "alchemist": 50}, shrines: ["Latex"], allFloors: true,
+    terrainTags: { "secondhalf": 5, "lastthird": 5, "miniboss": 10, "latexAnger": 6, "latexRage": 10, "latexPleased": 2, "latexFriendly": 4, "alchemist": 50 }, shrines: ["Latex"], allFloors: true,
     dropTable: [
-        {name: "Gold", amountMin: 15, amountMax: 25, weight: 5},
-        {name: "BlueKey", weight: 10},
-        {name: "StaffDoll", ignoreInInventory: true, weight: 10}
+        { name: "Gold", amountMin: 15, amountMax: 25, weight: 5 },
+        { name: "BlueKey", weight: 10 },
+        { name: "StaffDoll", ignoreInInventory: true, weight: 10 }
     ]
 }, {
     name: alchemistInspectorName, faction: "Corrupted", clusterWith: "alchemist", bound: "Alchemist", color: "#5353e9", playLine: "Gagged",
@@ -84,14 +84,14 @@ KinkyDungeonEnemies.push({
         remoteAmount: 5
     },
     events: [
-        {trigger: "afterDamageEnemy", type: "bleedEffectTile", kind: "LatexThin", aoe: 1.5, power: 3, chance: 1.0, duration: 20},
-        {trigger: "beforeDamage", type: alchemistFactionDomFlag},
-        {trigger: "afterEnemyTick", type: alchemistDomRefreshFlag}
+        { trigger: "afterDamageEnemy", type: "bleedEffectTile", kind: "LatexThin", aoe: 1.5, power: 3, chance: 1.0, duration: 20 },
+        { trigger: "beforeDamage", type: alchemistFactionDomFlag },
+        { trigger: "afterEnemyTick", type: alchemistDomRefreshFlag }
     ],
     attackPoints: 3, attack: "MeleeWillBindVibe", attackWidth: 1, attackRange: 1, tilesMinRange: 1, power: 0.1, dmgType: "charm",
     terrainTags: {},
     allFloors: true, shrines: ["Latex"],
-    dropTable: [{name: "Gold", amountMin: 10, amountMax: 20, weight: 10}]
+    dropTable: [{ name: "Gold", amountMin: 10, amountMax: 20, weight: 10 }]
 });
 
 // Corrupted Maid
@@ -122,12 +122,12 @@ KDUtilCommon.KinkyDungeonCloneEnemy("Maidforce", corruptedMaidName, {
     faction: "Corrupted",
     stealth: 2, failAttackFlag: [corruptedMaidDomFlag], ignoreFlag: [corruptedMaidDomFlag],
     dropTable: [
-        {name: "Duster", weight: 5, ignoreInInventory: true},
-        {name: "Gold", amountMin: 15, amountMax: 25, weight: 10}
+        { name: "Duster", weight: 5, ignoreInInventory: true },
+        { name: "Gold", amountMin: 15, amountMax: 25, weight: 10 }
     ],
     weight: -20,
     events: [
-        {trigger: "beforeDamage", type: "corruptedMaid"},
+        { trigger: "beforeDamage", type: "corruptedMaid" },
     ],
     tags: KDMapInit(["nocapture", "nosub", "leashing", "tickleweakness", "imprisonable", "opendoors", "human", "melee", "corruptedMaid", "maid", "minor", "search"])
 });
@@ -137,34 +137,19 @@ const corruptedMummyName = "CorruptedMummy";
 const corruptedMummyText = "Corrupted Mummy";
 const corruptedMummyDomFlag = "CorruptedMummyDom";
 let restraintsToAddMummy = [
-    "CorruptedMummyCollar",
-    //"CorruptedMaidLeatherHeels",
-    //"DusterGag",
-    //"MaidAnkleCuffs",
-    //"MaidAnkleCuffs2",
-    //"LegShackles",
-    //"LegShackles2",
-    //"CorruptedMaidElbowShackles",
-    //"MaidBelt",
-    //"CorruptedMaidArmbinder",
-    //"MaidVibe",
-    //"MaidCBelt",
-    //"CorruptedMaidNippleWeights",
-    //"TrapBra",
-    //"CorruptedMaidCollar",
-    //"CorruptedMaidLeash",
+    "CorruptedHardSlimeFeet", "CorruptedHardSlimeBoots", "CorruptedHardSlimeLegs", "CorruptedHardSlimeArms", "CorruptedHardSlimeHands", "CorruptedHardSlimeMouth", "CorruptedHardSlimeHead", "CorruptedMummyCollar",
 ];
 
 KinkyDungeonEnemies.push({
     name: corruptedMummyName,
     tags: KDMapInit(["nocapture", "nosub", "leashing", "notalk", "imprisonable", "opendoors", "human", "ranged", "corruptedMummy", "search"]),
-    stealth: 2, 
-    failAttackFlag: [corruptedMummyDomFlag], 
+    stealth: 2,
+    failAttackFlag: [corruptedMummyDomFlag],
     ignoreFlag: [corruptedMummyDomFlag],
     dropTable: [
-        {name: "Duster", weight: 5, ignoreInInventory: true},
-        {name: "Gold", amountMin: 15, amountMax: 25, weight: 10},
-        {name: "SlimeRaw", amount: 3, weight: 10},
+        { name: "Duster", weight: 5, ignoreInInventory: true },
+        { name: "Gold", amountMin: 15, amountMax: 25, weight: 10 },
+        { name: "SlimeRaw", amount: 3, weight: 10 },
     ],
     Magic: {
         castCooldownUnique: {
@@ -180,26 +165,26 @@ KinkyDungeonEnemies.push({
     style: "Nothing",
     playLine: "DomMaid",
     armor: 30,
-    kite: 1.5, 
-    followRange: 3, 
+    kite: 1.5,
+    followRange: 3,
     playerFollowRange: 3,
     AI: "hunt",
     maxhp: 15,
     minLevel: 0,
     weight: -13,
     movePoints: 4,
-    spellCooldownMult: 1, 
-    spellCooldownMod: 0, 
-    stopToCast: true, 
+    spellCooldownMult: 1,
+    spellCooldownMod: 0,
+    stopToCast: true,
     spellRdy: true,
-    castWhileMoving: true, 
-    evasion: 0.5, 
+    castWhileMoving: true,
+    evasion: 0.5,
     CountLimit: true,
-    visionRadius: 20, 
+    visionRadius: 20,
     playerBlindSight: 100,
-    attackPoints: 1, 
-    attack: "SpellMeleeBind", 
-    attackWidth: 1, 
+    attackPoints: 1,
+    attack: "SpellMeleeBind",
+    attackWidth: 1,
     attackRange: 1,
     fullBoundBonus: 3,
     power: 3,
@@ -208,16 +193,16 @@ KinkyDungeonEnemies.push({
     maxblock: 0,
     maxdodge: 1,
     events: [
-        {trigger: "beforeDamage", type: "corruptedMummy"},
+        { trigger: "beforeDamage", type: "corruptedMummy" },
     ],
     Defeat: {
         furnitureTags: [
-            {tags: ["shadowLatexRestraints"], count: 5},
-            {tags: ["shadowBall"], count: 1},
+            { tags: ["shadowLatexRestraints"], count: 5 },
+            { tags: ["shadowBall"], count: 1 },
         ],
     },
     effect: {
-        effect: {name: "ShadowEncase"},
+        effect: { name: "ShadowEncase" },
     },
     allFloors: true,
 });
@@ -244,13 +229,13 @@ KinkyDungeonEnemies.push({
     stamina: 3,
     squeeze: true, evasion: -1, followRange: 1, AI: "ambush",
     visionRadius: 10.0, blindSight: 2.5, maxhp: 20, minLevel: 6, weight: 1, movePoints: 4, attackPoints: 2, attack: "MeleeBind", attackWidth: 2, attackRange: 1, power: 4, dmgType: "glue", fullBoundBonus: 2, disarm: 0.7,
-    terrainTags: {"tmb": 3, "slime": 2.5, "plant": 2, "passage": 20, "open": -10, "slimeOptOut": -0.9, "slimePref": 1}, allFloors: true, shrines: ["Latex"],
+    terrainTags: { "tmb": 3, "slime": 2.5, "plant": 2, "passage": 20, "open": -10, "slimeOptOut": -0.9, "slimePref": 1 }, allFloors: true, shrines: ["Latex"],
     events: [
-        {trigger: "afterDamageEnemy", type: "bleedEffectTile", kind: "Slime", aoe: 1.5, power: 3, chance: 1.0, duration: 20},
-        {trigger: "afterEnemyTick", type: "createEffectTile", kind: "LatexThin", time: 25, power: 2, chance: 0.5, aoe: 0.5},
-        {trigger: "beforeDamage", type: "cubeEngulf", power: 0, color: "#880044"},
+        { trigger: "afterDamageEnemy", type: "bleedEffectTile", kind: "Slime", aoe: 1.5, power: 3, chance: 1.0, duration: 20 },
+        { trigger: "afterEnemyTick", type: "createEffectTile", kind: "LatexThin", time: 25, power: 2, chance: 0.5, aoe: 0.5 },
+        { trigger: "beforeDamage", type: "cubeEngulf", power: 0, color: "#880044" },
     ],
-    dropTable: [{name: "Gold", amountMin: 30, amountMax: 50, weight: 1}]
+    dropTable: [{ name: "Gold", amountMin: 30, amountMax: 50, weight: 1 }]
 });
 
 // Events
@@ -258,7 +243,7 @@ KinkyDungeonSpellListEnemies.push({
     enemySpell: true, name: alchemistBindSpell, sfx: "Miss", manacost: 5,
     specialCD: 15, components: ["Arms"], level: 1, type: "bolt",
     projectileTargeting: true, onhit: "", power: 4, delay: 0, range: 50, damage: "glue",
-    speed: 1, playerEffect: {name: "Bind", damage: "glue", power: 4, count: 1, tag: petRestraintWithSpellTag}
+    speed: 1, playerEffect: { name: "Bind", damage: "glue", power: 4, count: 1, tag: petRestraintWithSpellTag }
 });
 
 KDEventMapEnemy.beforeDamage[alchemistDomFlag] = (e, enemy, data) => {
@@ -311,7 +296,7 @@ KDEventMapEnemy.beforeDamage[alchemistDomFlag] = (e, enemy, data) => {
                 KinkyDungeonPassOut(true);
                 KinkyDungeonSetDress(petDressName, petDressName);
                 if (!KinkyDungeonInventoryGet(petDressName)) {
-                    let outfit = {name: petDressName, id: KinkyDungeonGetItemID(), type: "Outfit"};
+                    let outfit = { name: petDressName, id: KinkyDungeonGetItemID(), type: "Outfit" };
                     KinkyDungeonInventoryAdd(outfit);
                 }
             }
@@ -322,7 +307,7 @@ KDEventMapEnemy.beforeDamage[alchemistDomFlag] = (e, enemy, data) => {
             KinkyDungeonApplyBuffToEntity(KinkyDungeonPlayerEntity, {
                 id: alchemistDommedFlag, type: "Flag", duration: 20, power: 1, maxCount: 1, currentCount: 1, tags: ["attack", "cast"],
                 events: [
-                    {type: alchemistDommedFlag, trigger: "tickAfter"}
+                    { type: alchemistDommedFlag, trigger: "tickAfter" }
                 ]
             });
 
@@ -348,7 +333,7 @@ KDEventMapEnemy.beforeDamage[alchemistFactionDomFlag] = (e, enemy, data) => {
         KinkyDungeonApplyBuffToEntity(KinkyDungeonPlayerEntity, {
             id: alchemistDommedFlag, type: "Flag", duration: 20, power: 1, maxCount: 1, currentCount: 1, tags: ["attack", "cast"],
             events: [
-                {type: alchemistDommedFlag, trigger: "tickAfter"}
+                { type: alchemistDommedFlag, trigger: "tickAfter" }
             ]
         });
     }
@@ -397,7 +382,7 @@ KDEventMapEnemy.beforeDamage.corruptedMaid = (e, enemy, data) => {
             let flagBuff = {
                 id: corruptedMaidDomFlag, type: "Flag", duration: 10, power: 1, maxCount: 1, currentCount: 1, tags: ["attack", "cast"],
                 events: [
-                    {type: corruptedMaidDomFlag, trigger: "tickAfter"},
+                    { type: corruptedMaidDomFlag, trigger: "tickAfter" },
                 ]
             };
 
@@ -428,7 +413,7 @@ KDEventMapBuff.tickAfter[corruptedMaidDomFlag] = (e, buff, entity, data) => {
         KDBreakTether(entity);
         KinkyDungeonSetDress(petDressName, petDressName);
         if (!KinkyDungeonInventoryGet(petDressName)) {
-            let outfit = {name: petDressName, id: KinkyDungeonGetItemID(), type: "Outfit"};
+            let outfit = { name: petDressName, id: KinkyDungeonGetItemID(), type: "Outfit" };
             KinkyDungeonInventoryAdd(outfit);
         }
         KinkyDungeonMapParams[KinkyDungeonMapIndex[MiniGameKinkyDungeonCheckpoint]].defeat_outfit = petDressName;
@@ -439,7 +424,7 @@ KDEventMapBuff.tickAfter[corruptedMaidDomFlag] = (e, buff, entity, data) => {
         KinkyDungeonApplyBuffToEntity(KinkyDungeonPlayerEntity, {
             id: corruptedMaidDomFlag, type: "Flag", duration: tempLeashDuration, power: 1, maxCount: 1, currentCount: 1, tags: ["attack", "cast"],
             events: [
-                {type: corruptedMaidDomFlag, trigger: "tickAfter"},
+                { type: corruptedMaidDomFlag, trigger: "tickAfter" },
             ]
         });
         KinkyDungeonSetFlag("TempLeash", tempLeashDuration);
@@ -486,7 +471,7 @@ KDEventMapBuff.tickAfter[corruptedMummyDomFlag] = (e, buff, entity, data) => {
         KDBreakTether(entity);
         KinkyDungeonSetDress(petDressName, petDressName);
         if (!KinkyDungeonInventoryGet(petDressName)) {
-            let outfit = {name: petDressName, id: KinkyDungeonGetItemID(), type: "Outfit"};
+            let outfit = { name: petDressName, id: KinkyDungeonGetItemID(), type: "Outfit" };
             KinkyDungeonInventoryAdd(outfit);
         }
         KinkyDungeonMapParams[KinkyDungeonMapIndex[MiniGameKinkyDungeonCheckpoint]].defeat_outfit = petDressName;
@@ -497,7 +482,7 @@ KDEventMapBuff.tickAfter[corruptedMummyDomFlag] = (e, buff, entity, data) => {
         KinkyDungeonApplyBuffToEntity(KinkyDungeonPlayerEntity, {
             id: corruptedMummyDomFlag, type: "Flag", duration: tempLeashDuration, power: 1, maxCount: 1, currentCount: 1, tags: ["attack", "cast"],
             events: [
-                {type: corruptedMummyDomFlag, trigger: "tickAfter"},
+                { type: corruptedMummyDomFlag, trigger: "tickAfter" },
             ]
         });
         KinkyDungeonSetFlag("TempLeash", tempLeashDuration);
@@ -552,7 +537,7 @@ KDEventMapInventory.tick.cubeEncasement = (e, item, data) => {
         KinkyDungeonApplyBuffToEntity(KinkyDungeonPlayerEntity, {
             id: engulfFlag, type: "Flag", duration: 55, power: 1, maxCount: 1, currentCount: 1, tags: ["attack", "cast"],
             events: [
-                {type: engulfFlag, trigger: "tickAfter"}
+                { type: engulfFlag, trigger: "tickAfter" }
             ]
         });
     }

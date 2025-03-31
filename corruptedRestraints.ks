@@ -1,6 +1,13 @@
-// corruptedRestraints.js (исправленная версия)
+let KDUtilCommon = window.KDUtilCommon;
 const cRestraints = {
     // Mummy
+    corruptedMummyHardSlimeFeet: "CorruptedHardSlimeFeet",
+    corruptedMummyHardSlimeBoots: "CorruptedHardSlimeBoots",
+    corruptedMummyHardSlimeLegs: "CorruptedHardSlimeLegs",
+    corruptedMummyHardSlimeArms: "CorruptedHardSlimeArms",
+    corruptedMummyHardSlimeHands: "CorruptedHardSlimeHands",
+    corruptedMummyHardSlimeMouth: "CorruptedHardSlimeMouth",
+    corruptedMummyHardSlimeHead: "CorruptedHardSlimeHead",
     corruptedMummyCollar: "CorruptedMummyCollar",
     // Cube
     corruptedCubeCollar: "CorruptedSlimeCollar",
@@ -53,29 +60,30 @@ KinkyDungeonRestraints.push({
     Group: "ItemNeck",
     power: 10,
     weight: 0,
-    escapeChance: {"Struggle": -1.0, "Cut": -1.0, "Remove": -1.0, "Pick": -1.0},
-    maxwill: 0.0,
+    escapeChance: { "Struggle": -1.0, "Cut": 1.0, "Remove": -1.0, "Pick": -1.0 },
+    affinity: { Struggle: ["Sharp",], Remove: ["Hook"], },
+    maxwill: 0.5,
     Filters: {
-        Collar: {"gamma": 1, "saturation": 1, "contrast": 1, "brightness": 1.5, "red": 1.5, "green": 0.8, "blue": 2.0, "alpha": 1}
+        Collar: { "gamma": 1.0, "saturation": 0.6, "contrast": 1.0, "brightness": 0.6, "red": 1.0, "green": 0.7, "blue": 1.8, "alpha": 1 },
     },
     unlimited: true,
-    enemyTags: {"CorruptedMummy": 5},
-    playerTags: {"ItemNeckFull": -2},
+    enemyTags: { "CorruptedMummy": 5 },
+    playerTags: { "ItemNeckFull": -2 },
     minLevel: 0,
     allFloors: true,
     shrine: ["Collars", "Leather"],
     events: [
-        {trigger: "tick", type: "corruptedMummyEffect"},
-        {trigger: "beforeStruggleCalc", type: "corruptedMummyStruggle"}
+        { trigger: "tick", type: "corruptedMummyEffect" },
+        { trigger: "beforeStruggleCalc", type: "corruptedMummyCollarStruggle" }
     ]
 });
 
 KDEventMapInventory.tick.corruptedMummyEffect = (e, item, data) => {
-    if (item.name === "CorruptedMummyCollar") {
-        const slimeRestraints = ["HardSlimeFeet", "HardSlimeBoots", "HardSlimeLegs", "HardSlimeArms", "HardSlimeHands", "HardSlimeMouth", "HardSlimeHead"];
+    if (item.name === cRestraints.corruptedMummyCollar) {
+        const corruptedRestraints = [cRestraints.corruptedMummyHardSlimeFeet, cRestraints.corruptedMummyHardSlimeBoots, cRestraints.corruptedMummyHardSlimeLegs, cRestraints.corruptedMummyHardSlimeArms, cRestraints.corruptedMummyHardSlimeHands, cRestraints.corruptedMummyHardSlimeMouth, cRestraints.corruptedMummyHardSlimeHead];
         const equippedRestraints = KinkyDungeonAllRestraint().map(inv => inv.name);
         if (KDRandom() >= 0.9) {
-            for (const restraintName of slimeRestraints) {
+            for (const restraintName of corruptedRestraints) {
                 if (equippedRestraints.includes(restraintName)) {
                     continue;
                 }
@@ -87,10 +95,111 @@ KDEventMapInventory.tick.corruptedMummyEffect = (e, item, data) => {
     }
 };
 
-KDEventMapInventory.beforeStruggleCalc.corruptedMummyStruggle = (e, item, data) => {
-    if (data.restraint && data.restraint.name === "CorruptedMummyCollar" && KinkyDungeonStatWill < 210) {
+
+KDEventMapInventory.beforeStruggleCalc.corruptedMummyCollarStruggle = (e, item, data) => {
+    if (data.restraint && data.restraint.name === cRestraints.corruptedMummyCollar) {
+        if (KinkyDungeonStatWill < 12.5) {
+            data.escapeChance = -1000;
+            KinkyDungeonSendTextMessage(10, "You feels like you are not have enough will..", "#ff0000", 2, true);
+            KinkyDungeonLock(item, "Divine2", false, false, false, false);
+        } else {
+            data.escapeChance = 1000;
+            KinkyDungeonLock(item, "", false, false, false, false);
+        }
+    }
+};
+
+let KDRubberLink = ["Wrapping", "Tape", "Belts", "Masks", "Mittens"];
+KinkyDungeonRestraints.push(
+    {
+        inventory: true, unlimited: true, removePrison: true, name: cRestraints.corruptedMummyHardSlimeBoots, debris: "Slime", linkCategory: "Slime", linkSize: 0.6, LinkableBy: [...KDRubberLink], renderWhenLinked: [...KDRubberLink], inaccessible: true, Asset: "ToeTape", Type: "Full", Color: "#332437", Group: "ItemBoots", blockfeet: true, addTag: ["FeetLinked"], power: 5, weight: 0,
+        escapeChance: { "Struggle": 0, "Cut": 0.1, "Remove": 0 }, failSuffix: { "Remove": "SlimeHard" },
+        affinity: { Struggle: ["Sharp",], Remove: ["Hook"], },
+        Filters: { Rubber: { "gamma": 1.0, "saturation": 0.6, "contrast": 1.0, "brightness": 0.6, "red": 1.0, "green": 0.7, "blue": 1.8, "alpha": 1 } },
+        Model: "RubberBoots",
+        enemyTags: { "latexEncase": 100, "latexEncaseRandom": 103 }, playerTags: {},
+        minLevel: 0, allFloors: true, shrine: ["Latex", "Wrapping", "SlimeHard", "Rubber"],
+        events: [
+            { trigger: "beforeStruggleCalc", type: "corruptedMummyHardSlimeStruggle" }
+        ]
+    },
+    {
+        inventory: true, unlimited: true, removePrison: true, name: cRestraints.corruptedMummyHardSlimeFeet, debris: "Slime", linkCategory: "Slime", linkSize: 0.6, LinkableBy: [...KDRubberLink], renderWhenLinked: [...KDRubberLink], inaccessible: true, Asset: "DuctTape", Type: "CompleteFeet", OverridePriority: 24, Color: "#332437", Group: "ItemFeet", blockfeet: true, addTag: ["FeetLinked"], power: 6, weight: -100,
+        escapeChance: { "Struggle": 0.0, "Cut": 0.1, "Remove": 0 }, failSuffix: { "Remove": "SlimeHard" },
+        affinity: { Struggle: ["Sharp",], Remove: ["Hook"], },
+        Filters: { Rubber: { "gamma": 1.0, "saturation": 0.6, "contrast": 1.0, "brightness": 0.6, "red": 1.0, "green": 0.7, "blue": 1.8, "alpha": 1 } },
+        Model: "RubberFeet",
+        enemyTags: { "latexEncase": 100, "latexEncaseRandom": 103 }, playerTags: { "ItemBootsFull": 15 },
+        minLevel: 0, allFloors: true, shrine: ["Latex", "Wrapping", "SlimeHard", "Rubber"]
+    },
+    {
+        inventory: true, unlimited: true, removePrison: true, name: cRestraints.corruptedMummyHardSlimeLegs, debris: "Slime", linkCategory: "Slime", linkSize: 0.6, LinkableBy: [...KDRubberLink], renderWhenLinked: [...KDRubberLink], inaccessible: true, remove: ["ClothLower"], Asset: "SeamlessHobbleSkirt", Color: "#332437", Group: "ItemLegs", hobble: 1, addTag: ["FeetLinked"], power: 6, weight: -102,
+        escapeChance: { "Struggle": 0.0, "Cut": 0.1, "Remove": 0 }, failSuffix: { "Remove": "SlimeHard" },
+        affinity: { Struggle: ["Sharp",], Remove: ["Hook"], },
+        Filters: { Rubber: { "gamma": 1.0, "saturation": 0.6, "contrast": 1.0, "brightness": 0.6, "red": 1.0, "green": 0.7, "blue": 1.8, "alpha": 1 } },
+        Model: "RubberLegs",
+        enemyTags: { "latexEncase": 100, "latexEncaseRandom": 103 }, playerTags: { "ItemFeetFull": 2, "ItemBootsFull": 2 },
+        minLevel: 0, allFloors: true, shrine: ["Latex", "Hobbleskirts", "Wrapping", "SlimeHard", "Rubber"],
+        events: [
+            { trigger: "beforeStruggleCalc", type: "corruptedMummyHardSlimeStruggle" }
+        ]
+    },
+    {
+        inventory: true, unlimited: true, removePrison: true, name: cRestraints.corruptedMummyHardSlimeArms, debris: "Slime", linkCategory: "Slime", linkSize: 0.6, LinkableBy: [...KDRubberLink], renderWhenLinked: [...KDRubberLink], inaccessible: true, remove: ["Bra"], Asset: "StraitLeotard", Modules: [0, 0, 0, 0], Color: ["#332437", "#332437", "#332437"], Group: "ItemArms", bindarms: true, bindhands: 0.35, power: 8, weight: -102,
+        escapeChance: { "Struggle": 0.0, "Cut": 0.1, "Remove": 0 }, failSuffix: { "Remove": "SlimeHard" },
+        affinity: { Struggle: ["Sharp",], Remove: ["Hook"], },
+        Filters: { Rubber: { "gamma": 1.0, "saturation": 0.6, "contrast": 1.0, "brightness": 0.6, "red": 1.0, "green": 0.7, "blue": 1.8, "alpha": 1 } },
+        Model: "RubberArms",
+        enemyTags: { "latexEncase": 100, "latexEncaseRandom": 103 }, playerTags: { "ItemFeetFull": 2, "ItemBootsFull": 2, "ItemLegsFull": 2 },
+        minLevel: 0, allFloors: true, shrine: ["Latex", "SlimeHard", "Rubber", "Wrapping"],
+        events: [
+            { trigger: "beforeStruggleCalc", type: "corruptedMummyHardSlimeStruggle" }
+        ]
+    },
+    {
+        inventory: true, unlimited: true, removePrison: true, name: cRestraints.corruptedMummyHardSlimeHands, debris: "Slime", linkCategory: "Slime", linkSize: 0.6, LinkableBy: [...KDRubberLink], renderWhenLinked: [...KDRubberLink], inaccessible: true, Asset: "DuctTape", Color: "#332437", Group: "ItemHands", bindhands: 0.65, power: 5, weight: -102,
+        escapeChance: { "Struggle": 0.0, "Cut": 0.1, "Remove": 0 }, failSuffix: { "Remove": "SlimeHard" },
+        affinity: { Struggle: ["Sharp",], Remove: ["Hook"], },
+        Filters: { Rubber: { "gamma": 1.0, "saturation": 0.6, "contrast": 1.0, "brightness": 0.6, "red": 1.0, "green": 0.7, "blue": 1.8, "alpha": 1 } },
+        Model: "RubberHands",
+        enemyTags: { "latexEncase": 100, "latexEncaseRandom": 103 }, playerTags: { "ItemFeetFull": 1, "ItemBootsFull": 1, "ItemLegsFull": 1, "ItemHeadFull": 1 },
+        minLevel: 0, allFloors: true, shrine: ["Latex", "Wrapping", "SlimeHard", "Rubber"],
+        events: [
+            { trigger: "beforeStruggleCalc", type: "corruptedMummyHardSlimeStruggle" }
+        ]
+    },
+    {
+        inventory: true, unlimited: true, removePrison: true, name: cRestraints.corruptedMummyHardSlimeMouth, debris: "Slime", linkCategory: "Slime", linkSize: 0.6, inaccessible: true, Asset: "KittyGag", LinkableBy: [...KDRubberLink], renderWhenLinked: [...KDRubberLink], Color: ["#332437", "#332437", "#332437"], Group: "ItemMouth", AssetGroup: "ItemMouth3", gag: 0.75, power: 6, weight: -102,
+        escapeChance: { "Struggle": 0.0, "Cut": 0.1, "Remove": 0 }, failSuffix: { "Remove": "SlimeHard" },
+        affinity: { Struggle: ["Sharp",], Remove: ["Hook"], },
+        Filters: { Rubber: { "gamma": 1.0, "saturation": 0.6, "contrast": 1.0, "brightness": 0.6, "red": 1.0, "green": 0.7, "blue": 1.8, "alpha": 1 } },
+        Model: "RubberMouth",
+        enemyTags: { "latexEncase": 100, "latexEncaseRandom": 103 }, playerTags: { "ItemFeetFull": 1, "ItemBootsFull": 1, "ItemLegsFull": 1, "ItemHandsFull": 1, "ItemArmsFull": 1 },
+        minLevel: 0, allFloors: true, shrine: ["Latex", "Wrapping", "SlimeHard", "Rubber", "Gags", "FlatGag"],
+        events: [
+            { trigger: "beforeStruggleCalc", type: "corruptedMummyHardSlimeStruggle" }
+        ]
+    },
+    {
+        inventory: true, unlimited: true, removePrison: true, name: cRestraints.corruptedMummyHardSlimeHead, debris: "Slime", linkCategory: "Slime", linkSize: 0.6, LinkableBy: [...KDRubberLink], renderWhenLinked: [...KDRubberLink], inaccessible: true, Asset: "LeatherSlimMask", Color: "#332437", Group: "ItemHead", gag: 0.5, blindfold: 4, power: 6, weight: -102,
+        escapeChance: { "Struggle": 0.0, "Cut": 0.1, "Remove": 0 }, failSuffix: { "Remove": "SlimeHard" },
+        affinity: { Struggle: ["Sharp",], Remove: ["Hook"], },
+        Filters: { Rubber: { "gamma": 1.0, "saturation": 0.6, "contrast": 1.0, "brightness": 0.6, "red": 1.0, "green": 0.7, "blue": 1.8, "alpha": 1 } },
+        Model: "RubberHead",
+        enemyTags: { "latexEncase": 100, "latexEncaseRandom": 103 }, playerTags: { "ItemFeetFull": 1, "ItemBootsFull": 1, "ItemLegsFull": 1, "ItemHandsFull": 1, "ItemArmsFull": 1, "ItemMouth3Full": 1, "Unmasked": -1000 },
+        minLevel: 0, allFloors: true, shrine: ["Latex", "Wrapping", "Block_ItemMouth", "SlimeHard", "Rubber"],
+        events: [
+            { trigger: "beforeStruggleCalc", type: "corruptedMummyHardSlimeStruggle" }
+        ]
+    },
+);
+
+KDEventMapInventory.beforeStruggleCalc.corruptedMummyHardSlimeStruggle = (e, item, data) => {
+    if (KDUtilCommon.PlayerWearsRestraint(cRestraints.corruptedMummyCollar)) {
         data.escapeChance = -1000;
-        KinkyDungeonSendTextMessage(10, "You feels like you are not have enough strength..", "#ff0000", 2, true);
+        KinkyDungeonSendTextMessage(10, "You feels like collar prevents you from doing this..", "#ff0000", 2, true);
+    } else {
+        data.escapeChance = 1000;
     }
 };
 
@@ -516,9 +625,44 @@ KinkyDungeonRestraints.push({
     ]
 });
 // Mummy
-KinkyDungeonAddRestraintText("CorruptedMummyCollar", "Corrupted Mummy Collar", 
-    "A cursed collar that binds tightly to your neck..", 
+KinkyDungeonAddRestraintText(cRestraints.corruptedMummyCollar, "Corrupted Mummy Collar",
+    "A cursed collar that binds tightly to your neck..",
     "It cannot be removed if your willpower is not enough.");
+
+KinkyDungeonAddRestraintText(cRestraints.corruptedMummyHardSlimeFeet, "Corrupted Mummy Latex Feet",
+    "This restraint pulses with a naughty energy, tightening just a little more with every breath you take :3",
+    "It clings to you like a lover who won’t let go, teasing your every move~"
+);
+
+KinkyDungeonAddRestraintText(cRestraints.corruptedMummyHardSlimeBoots, "Corrupted Mummy Latex Boots",
+    "A slick embrace that feels way too good, squeezing you in all the right places ;>",
+    "Every step sends shivers up your spine, as if it’s whispering dirty secrets to your soul~"
+);
+
+KinkyDungeonAddRestraintText(cRestraints.corruptedMummyHardSlimeLegs, "Corrupted Mummy Latex Legs",
+    "This thing wraps around you with a possessive grip, making your heart race with every squirm :3",
+    "It’s like it knows your weaknesses and loves to toy with them >w<"
+);
+
+KinkyDungeonAddRestraintText(cRestraints.corruptedMummyHardSlimeArms, "Corrupted Mummy Latex Arms",
+    "A tight, slippery hold that feels like it’s pulling you into a naughty dance :>",
+    "Struggling only makes it cling harder, as if it’s enjoying your defiance~"
+);
+
+KinkyDungeonAddRestraintText(cRestraints.corruptedMummyHardSlimeHands, "Corrupted Mummy Latex Hands",
+    "This restraint has a mind of its own, caressing you with a wicked little squeeze ;3",
+    "It’s like it’s daring you to fight back, knowing you’ll just melt under its touch~"
+);
+
+KinkyDungeonAddRestraintText(cRestraints.corruptedMummyHardSlimeMouth, "Corrupted Mummy Latex Mouth",
+    "A sultry seal that muffles your gasps, pressing against you with a teasing warmth :>",
+    "Every word you try to speak turns into a little whimper it seems to adore~"
+);
+
+KinkyDungeonAddRestraintText(cRestraints.corruptedMummyHardSlimeHead, "Corrupted Mummy Latex Head",
+    "This thing envelopes you with a dark, playful aura, clouding your thoughts with every pulse :3",
+    "It’s like a naughty whisper in your mind, tempting you to give in completely~"
+);
 
 // Cube
 KinkyDungeonAddRestraintText(cRestraints.corruptedCubeCollar, "Corrupted Slime Collar",
