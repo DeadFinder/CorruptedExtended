@@ -79,7 +79,7 @@ KDEventMapInventory.tick.corruptedMummyEffect = (e, item, data) => {
                 if (equippedRestraints.includes(restraintName)) {
                     continue;
                 }
-                KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName(randomRestraint), 0, true, undefined, false, undefined, undefined, undefined, item.faction);
+                KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName(restraintName), 0, true, undefined, false, undefined, undefined, undefined, item.faction);
                 KinkyDungeonSendTextMessage(10, "The corrupted mummy collar oozes slime onto you!", "#aa00cc", 2, true);
                 break;
             }
@@ -90,7 +90,7 @@ KDEventMapInventory.tick.corruptedMummyEffect = (e, item, data) => {
 KDEventMapInventory.beforeStruggleCalc.corruptedMummyStruggle = (e, item, data) => {
     if (data.restraint && data.restraint.name === "CorruptedMummyCollar" && KinkyDungeonStatWill < 210) {
         data.escapeChance = -1000;
-        KinkyDungeonSendTextMessage(10, "Your willpower is too low to remove the corrupted mummy collar!", "#ff0000", 2, true);
+        KinkyDungeonSendTextMessage(10, "You feels like you are not have enough strength..", "#ff0000", 2, true);
     }
 };
 
@@ -517,8 +517,8 @@ KinkyDungeonRestraints.push({
 });
 // Mummy
 KinkyDungeonAddRestraintText("CorruptedMummyCollar", "Corrupted Mummy Collar", 
-    "A cursed collar that binds tightly to your neck, oozing corrupting slime.", 
-    "It cannot be removed if your willpower is less than 250.");
+    "A cursed collar that binds tightly to your neck..", 
+    "It cannot be removed if your willpower is not enough.");
 
 // Cube
 KinkyDungeonAddRestraintText(cRestraints.corruptedCubeCollar, "Corrupted Slime Collar",

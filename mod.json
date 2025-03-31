@@ -1,8 +1,8 @@
 {
 	"modname": "Corrupted Extended",
 	"moddesc": "Corrupted enemies that tries to catch you.",
-	"author": "Matsuo / fix by DeadFinder",
-	"modbuild": "0.4.0",
+	"author": "Matsuo | [fix && maintain] by DeadFinder",
+	"modbuild": "0.4.1",
 	"gamemajor": 5,
 	"gameminor": 4,
 	"gamepatch_min": 32,
