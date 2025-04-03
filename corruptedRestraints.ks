@@ -58,37 +58,39 @@ KinkyDungeonRestraints.push({
     Model: "LeatherCollar",
     Color: "#aa00cc",
     Group: "ItemNeck",
-    power: 10,
+    power: 3,
     weight: 0,
-    escapeChance: { "Struggle": -1.0, "Cut": 1.0, "Remove": -1.0, "Pick": -1.0 },
-    affinity: { Struggle: ["Sharp",], Remove: ["Hook"], },
-    maxwill: 0.5,
+    escapeChance: { "Struggle": 1.0, "Cut": 1.0, "Remove": 1.0, "Pick": 0.05 },
+    maxwill: 0.25,
     Filters: {
         Collar: { "gamma": 1.0, "saturation": 0.6, "contrast": 1.0, "brightness": 0.6, "red": 1.0, "green": 0.7, "blue": 1.8, "alpha": 1 },
     },
-    unlimited: true,
     enemyTags: { "CorruptedMummy": 5 },
-    playerTags: { "ItemNeckFull": -2 },
     minLevel: 0,
     allFloors: true,
-    shrine: ["Collars", "Leather"],
+    shrine: ["Ancient", "Collars", "Corrupted"],
+    LinkableBy: ["HighCollars", "Collars", "Modules"],
     events: [
-        { trigger: "tick", type: "corruptedMummyEffect" },
+        { trigger: "tick", type: "corruptedMummyCollarTick" },
         { trigger: "beforeStruggleCalc", type: "corruptedMummyCollarStruggle" }
     ]
 });
 
-KDEventMapInventory.tick.corruptedMummyEffect = (e, item, data) => {
+KDEventMapInventory.tick.corruptedMummyCollarTick = (e, item, data) => {
     if (item.name === cRestraints.corruptedMummyCollar) {
         const corruptedRestraints = [cRestraints.corruptedMummyHardSlimeFeet, cRestraints.corruptedMummyHardSlimeBoots, cRestraints.corruptedMummyHardSlimeLegs, cRestraints.corruptedMummyHardSlimeArms, cRestraints.corruptedMummyHardSlimeHands, cRestraints.corruptedMummyHardSlimeMouth, cRestraints.corruptedMummyHardSlimeHead];
         const equippedRestraints = KinkyDungeonAllRestraint().map(inv => inv.name);
-        if (KDRandom() >= 0.9) {
+        //let tile = KinkyDungeonTilesGet(`${KinkyDungeonPlayerEntity.x},${KinkyDungeonPlayerEntity.y}`);
+        if (KinkyDungeonBrightnessGet(KinkyDungeonPlayerEntity.x, KinkyDungeonPlayerEntity.y) < 1.5 || KinkyDungeonStatWill < 12.5) {
             for (const restraintName of corruptedRestraints) {
                 if (equippedRestraints.includes(restraintName)) {
                     continue;
                 }
-                KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName(restraintName), 0, true, undefined, false, undefined, undefined, undefined, item.faction);
-                KinkyDungeonSendTextMessage(10, "The corrupted mummy collar oozes slime onto you!", "#aa00cc", 2, true);
+                let wtf = Math.min(1.0, 0.9 + (0.01 * (corruptedRestraints.indexOf(restraintName) + 1)));
+                if (KDRandom() > wtf) {
+                    KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName(restraintName), 0, true, undefined, false, undefined, undefined, undefined, item.faction);
+                    KinkyDungeonSendTextMessage(10, "The corrupted mummy collar oozes corruption onto you..", "#aa00cc", 2, true);
+                }
                 break;
             }
         }
@@ -98,13 +100,14 @@ KDEventMapInventory.tick.corruptedMummyEffect = (e, item, data) => {
 
 KDEventMapInventory.beforeStruggleCalc.corruptedMummyCollarStruggle = (e, item, data) => {
     if (data.restraint && data.restraint.name === cRestraints.corruptedMummyCollar) {
-        if (KinkyDungeonStatWill < 12.5) {
-            data.escapeChance = -1000;
-            KinkyDungeonSendTextMessage(10, "You feels like you are not have enough will..", "#ff0000", 2, true);
+        if (KinkyDungeonBrightnessGet(KinkyDungeonPlayerEntity.x, KinkyDungeonPlayerEntity.y) < 1.5 || KinkyDungeonStatWill < 12.5) {
             KinkyDungeonLock(item, "Divine2", false, false, false, false);
+            data.escapeChance = -1000;
+            item.tightness = 10000;
         } else {
-            data.escapeChance = 1000;
             KinkyDungeonLock(item, "", false, false, false, false);
+            data.escapeChance = 1000;
+            item.tightness = 0;
         }
     }
 };
@@ -196,10 +199,11 @@ KinkyDungeonRestraints.push(
 
 KDEventMapInventory.beforeStruggleCalc.corruptedMummyHardSlimeStruggle = (e, item, data) => {
     if (KDUtilCommon.PlayerWearsRestraint(cRestraints.corruptedMummyCollar)) {
-        data.escapeChance = -1000;
-        KinkyDungeonSendTextMessage(10, "You feels like collar prevents you from doing this..", "#ff0000", 2, true);
-    } else {
-        data.escapeChance = 1000;
+        let breakable = [cRestraints.corruptedMummyHardSlimeHead, cRestraints.corruptedMummyHardSlimeMouth]
+        if (!breakable.includes(data.restraint.name)) {
+            data.escapeChance = -1000;
+            KinkyDungeonSendTextMessage(10, "You feels like collar prevents you from doing this..", "#ff0000", 2, true);
+        }
     }
 };
 
@@ -627,7 +631,7 @@ KinkyDungeonRestraints.push({
 // Mummy
 KinkyDungeonAddRestraintText(cRestraints.corruptedMummyCollar, "Corrupted Mummy Collar",
     "A cursed collar that binds tightly to your neck..",
-    "It cannot be removed if your willpower is not enough.");
+    "It cannot be removed if your willpower is not enough or you staying in dark place.");
 
 KinkyDungeonAddRestraintText(cRestraints.corruptedMummyHardSlimeFeet, "Corrupted Mummy Latex Feet",
     "This restraint pulses with a naughty energy, tightening just a little more with every breath you take :3",

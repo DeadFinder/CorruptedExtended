@@ -1,4 +1,3 @@
-// corruptedOutfits.js
 AddModel({
     Name: "TransparentCatsuitCroppedLowRise",
     TopLevel: false,
@@ -228,9 +227,9 @@ KDModelDresses.CorruptedMummy = [
         "Skirt": false
     },
     {
-        "Item": "BackShort",
+        "Item": "BlondeBack",
         "Filters": {
-            "BackShort": {
+            "Back": {
                 "gamma": 1.0,
                 "saturation": 1.0,
                 "contrast": 1.50,

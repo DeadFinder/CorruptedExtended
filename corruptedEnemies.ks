@@ -13,10 +13,10 @@ function ToArrayDeepSearch(startObj, arr = []) {
 }
 
 function AddAlchemistSet() {
-    KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName(cRestraints.corruptedAlchemistHeels + '2'), 0, true, undefined, false, undefined, undefined, undefined, true);
+    KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName(cRestraints.corruptedAlchemistHeels + '2'), 0, true, undefined, false, undefined, undefined, "Corrupted", true);
     ToArrayDeepSearch(aRestraintsNeed).forEach(val => KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName(val), 0, true, undefined, false, undefined, undefined, undefined, true));
     //KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName(cRestraints.corruptedAlchemistHeels + '2'));
-    KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName(cRestraints.corruptedAlchemistHeels + '2'), 0, true, undefined, false, undefined, undefined, undefined, true);
+    KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName(cRestraints.corruptedAlchemistHeels + '2'), 0, true, undefined, false, undefined, undefined, "Corrupted", true);
     KinkyDungeonSetDress(petDressName, petDressName);
 }
 
@@ -135,63 +135,17 @@ KDUtilCommon.KinkyDungeonCloneEnemy("Maidforce", corruptedMaidName, {
 // Corrupted Mummy
 const corruptedMummyName = "CorruptedMummy";
 const corruptedMummyText = "Corrupted Mummy";
-const corruptedMummyDomFlag = "CorruptedMummyDom";
-let restraintsToAddMummy = [
-    "CorruptedHardSlimeFeet", "CorruptedHardSlimeBoots", "CorruptedHardSlimeLegs", "CorruptedHardSlimeArms", "CorruptedHardSlimeHands", "CorruptedHardSlimeMouth", "CorruptedHardSlimeHead", "CorruptedMummyCollar",
-];
 
 KinkyDungeonEnemies.push({
     name: corruptedMummyName,
-    tags: KDMapInit(["nocapture", "nosub", "leashing", "notalk", "imprisonable", "opendoors", "human", "ranged", "corruptedMummy", "search"]),
-    stealth: 2,
-    failAttackFlag: [corruptedMummyDomFlag],
-    ignoreFlag: [corruptedMummyDomFlag],
-    dropTable: [
-        { name: "Duster", weight: 5, ignoreInInventory: true },
-        { name: "Gold", amountMin: 15, amountMax: 25, weight: 10 },
-        { name: "SlimeRaw", amount: 3, weight: 10 },
-    ],
-    Magic: {
-        castCooldownUnique: {
-            EnemyEnchantRope: 6,
-        },
-        priority: {
-            EnemyEnchantRope: 8,
-        },
-    },
-    spells: ["WitchSlimeBall", "WitchSlime", "LatexSpray"],
-    faction: "Corrupted",
-    outfit: "CorruptedMummy",
-    style: "Nothing",
-    playLine: "DomMaid",
-    armor: 30,
-    kite: 1.5,
-    followRange: 3,
-    playerFollowRange: 3,
-    AI: "hunt",
-    maxhp: 15,
-    minLevel: 0,
-    weight: -13,
-    movePoints: 4,
-    spellCooldownMult: 1,
-    spellCooldownMod: 0,
-    stopToCast: true,
-    spellRdy: true,
-    castWhileMoving: true,
-    evasion: 0.5,
-    CountLimit: true,
-    visionRadius: 20,
-    playerBlindSight: 100,
-    attackPoints: 1,
-    attack: "SpellMeleeBind",
-    attackWidth: 1,
-    attackRange: 1,
-    fullBoundBonus: 3,
-    power: 3,
-    terrainTags: {},
-    stamina: 3,
-    maxblock: 0,
-    maxdodge: 1,
+    tags: KDMapInit(["nocapture", "nosub", "leashing", "notalk", "imprisonable", "opendoors", "human", "ranged", "search"]),
+    spells: ["WitchSlimeBall", "WitchSlime", "LatexSpray"], spellCooldownMult: 1, spellCooldownMod: 0, castWhileMoving: true, stealth: 2,
+    faction: "Corrupted", outfit: "CorruptedMummy", style: "Nothing",
+    maxhp: 30, armor: 15, followRange: 1, kite: 3, AI: "hunt", dontKiteWhenDisabled: true,
+    minLevel: 0, weight: -13, movePoints: 4, attackPoints: 3, attack: "SpellMeleeBind", attackWidth: 2, attackRange: 1, power: 3, dmgType: "crush", fullBoundBonus: 1,
+    visionRadius: 7, blindSight: 10,
+    stamina: 6, preferDodge: true, maxblock: 1, maxdodge: 3,
+    terrainTags: {}, allFloors: true,
     events: [
         { trigger: "beforeDamage", type: "corruptedMummy" },
     ],
@@ -204,7 +158,12 @@ KinkyDungeonEnemies.push({
     effect: {
         effect: { name: "ShadowEncase" },
     },
-    allFloors: true,
+    dropTable: [
+        { name: "Duster", weight: 5, ignoreInInventory: true },
+        { name: "Gold", amountMin: 15, amountMax: 25, weight: 10 },
+        { name: "SlimeRaw", amount: 3, weight: 10 },
+        { name: "EnchKnife", ignoreInInventory: true, weight: 1 }
+    ],
 });
 
 // Corrupted Latex Cube
@@ -287,7 +246,7 @@ KDEventMapEnemy.beforeDamage[alchemistDomFlag] = (e, enemy, data) => {
         }
 
         if (selectedRestraint !== "") {
-            KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName(selectedRestraint), 0, true, undefined, false, undefined, undefined, undefined, true);
+            KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName(selectedRestraint), 0, true, undefined, false, undefined, undefined, "Corrupted", true);
         }
 
         if (totalPetRestraints > 5 && hasAlchemistLeash && !KinkyDungeonFlags.get(alchemistDommedFlag)) {
@@ -387,7 +346,7 @@ KDEventMapEnemy.beforeDamage.corruptedMaid = (e, enemy, data) => {
             };
 
             if (KinkyDungeonCurrentDress !== petDressName) {
-                KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName(dressingUpRestraint), 0, true, undefined, false, undefined, undefined, undefined, true);
+                KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName(dressingUpRestraint), 0, true, undefined, false, undefined, undefined, "Corrupted", true);
                 KinkyDungeonSendTextMessage(1, `${corruptedMaidText} pushes you to ground and begins changing your outfit!`, "white", 3);
                 flagBuff.enemy = enemy;
             }
@@ -441,59 +400,12 @@ KDEventMapBuff.tickAfter[corruptedMaidDomFlag] = (e, buff, entity, data) => {
 
 KDEventMapEnemy.beforeDamage.corruptedMummy = (e, enemy, data) => {
     if (data.enemy === enemy && data.target === KinkyDungeonPlayerEntity && !data.restrainsAdded) {
-        if (KinkyDungeonFlags.get(corruptedMummyDomFlag)) return;
         if (!KDUtilCommon.PlayerWearsRestraint("CorruptedMummyCollar")) {
             const restraint = KinkyDungeonGetRestraintByName("CorruptedMummyCollar");
-            if (!restraint) {
-                console.log("Corrupted mummy couldn't find the restraint with name: ", restraintName);
-                return;
-            }
-            if (KDRandom() >= 0.999) {
-                KinkyDungeonAddRestraintIfWeaker(restraint, 0, true, undefined, false, undefined, undefined, undefined, true);
+            if (KDRandom() >= 0.7) {
+                KinkyDungeonAddRestraintIfWeaker(restraint, 0, true, "Divine2", false, undefined, undefined, "Corrupted", true);
             }
         }
-    }
-};
-
-KDEventMapBuff.tickAfter[corruptedMummyDomFlag] = (e, buff, entity, data) => {
-    if (buff.duration > 0 && entity.player) {
-        if (!KinkyDungeonInventoryGet(corruptedMaidRestraints.collar)) {
-            KDBreakTether(entity);
-            KinkyDungeonExpireBuff(entity, corruptedMummyDomFlag);
-            return;
-        }
-        if (buff.enemy && buff.duration === 5) {
-            KinkyDungeonSetDress("None", "None");
-            KinkyDungeonSendTextMessage(1, `${corruptedMummyText} snapped your current outfit into void.`, "white", 3);
-        }
-        KinkyDungeonSetFlag("PlayerDommed", 2);
-    } else if (buff.enemy) {
-        KDBreakTether(entity);
-        KinkyDungeonSetDress(petDressName, petDressName);
-        if (!KinkyDungeonInventoryGet(petDressName)) {
-            let outfit = { name: petDressName, id: KinkyDungeonGetItemID(), type: "Outfit" };
-            KinkyDungeonInventoryAdd(outfit);
-        }
-        KinkyDungeonMapParams[KinkyDungeonMapIndex[MiniGameKinkyDungeonCheckpoint]].defeat_outfit = petDressName;
-        KinkyDungeonRemoveRestraintsWithName("RopeSnakeHogtieWrist");
-        KinkyDungeonSendTextMessage(1, `${corruptedMummyText} has transformed your outfit! +(Corrupted Maid Pet Outfit)`, "white", 3);
-        KinkyDungeonAttachTetherToEntity(2, buff.enemy);
-        const tempLeashDuration = 20;
-        KinkyDungeonApplyBuffToEntity(KinkyDungeonPlayerEntity, {
-            id: corruptedMummyDomFlag, type: "Flag", duration: tempLeashDuration, power: 1, maxCount: 1, currentCount: 1, tags: ["attack", "cast"],
-            events: [
-                { type: corruptedMummyDomFlag, trigger: "tickAfter" },
-            ]
-        });
-        KinkyDungeonSetFlag("TempLeash", tempLeashDuration);
-        KinkyDungeonSetFlag("TempLeashCD", tempLeashDuration * 2);
-        KinkyDungeonSetFlag("noResetIntent", 12);
-
-        buff.enemy.playWithPlayerCD = tempLeashDuration;
-        buff.enemy.IntentAction = "TempLeash";
-    } else {
-        KDBreakTether(entity);
-        KinkyDungeonExpireBuff(entity, corruptedMummyDomFlag);
     }
 };
 
@@ -509,13 +421,13 @@ KDEventMapEnemy.beforeDamage.cubeEngulf = (e, enemy, data) => {
             KinkyDungeonRemoveRestraintsWithShrine("SlimeHard");
             KinkyDungeonRemoveRestraintsWithShrine("Latex");
 
-            KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName(cRestraints.corruptedCubeEncasement), 0, true, undefined, false, undefined, undefined, undefined, true);
-            KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName(cRestraints.corruptedCubeCuffs), 0, true, undefined, false, undefined, undefined, undefined, true);
-            KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName(cRestraints.corruptedCubeCollar), 0, true, undefined, false, undefined, undefined, undefined, true);
-            KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName(cRestraints.corruptedCubeAnkles), 0, true, undefined, false, undefined, undefined, undefined, true);
-            KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName(cRestraints.corruptedCubeLegs), 0, true, undefined, false, undefined, undefined, undefined, true);
-            KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName(cRestraints.corruptedCubeGag), 0, true, undefined, false, undefined, undefined, undefined, true);
-            KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName(cRestraints.corruptedCubeBlindfold), 0, true, undefined, false, undefined, undefined, undefined, true);
+            KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName(cRestraints.corruptedCubeEncasement), 0, true, undefined, false, undefined, undefined, "Corrupted", true);
+            KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName(cRestraints.corruptedCubeCuffs), 0, true, undefined, false, undefined, undefined, "Corrupted", true);
+            KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName(cRestraints.corruptedCubeCollar), 0, true, undefined, false, undefined, undefined, "Corrupted", true);
+            KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName(cRestraints.corruptedCubeAnkles), 0, true, undefined, false, undefined, undefined, "Corrupted", true);
+            KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName(cRestraints.corruptedCubeLegs), 0, true, undefined, false, undefined, undefined, "Corrupted", true);
+            KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName(cRestraints.corruptedCubeGag), 0, true, undefined, false, undefined, undefined, "Corrupted", true);
+            KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName(cRestraints.corruptedCubeBlindfold), 0, true, undefined, false, undefined, undefined, "Corrupted", true);
         }, "Blindness");
     }
 };
