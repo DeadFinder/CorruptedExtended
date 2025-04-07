@@ -1,21 +1,24 @@
 KinkyDungeonFactionColors.Corrupted = ["#8B53E9", "#9e2e60", "#8B53E9"];
+KinkyDungeonFactionColors.CorruptedHidden = ["#8B53E9", "#9e2e60", "#8B53E9"];
 
 KinkyDungeonHiddenFactions.set("Corrupted", true);
+KinkyDungeonHiddenFactions.set("CorruptedHidden", true);
 addTextKey("KinkyDungeonFactionCorrupted", "Corrupted");
+addTextKey("KinkyDungeonFactionCorruptedHidden", " ");
 
 KinkyDungeonFactionRelationsBase["Corrupted"] = {
     Player: -1.0,
-    Slime: 1.0,
-    Latex: 1.0,
-    Demon: 1.0,
-    Witch: 1.0,
     Bountyhunter: -1.0,
     Nevermere: -1.0,
     Maidforce: -1.0,
     Elf: -1.0,
     Bandit: -1.0,
 };
+KinkyDungeonFactionRelationsBase["CorruptedHidden"] = {
+    Player: -1.0,
+};
 KinkyDungeonFactionRelationsBase["Player"]["Corrupted"] = -1.0;
+KinkyDungeonFactionRelationsBase["Player"]["CorruptedHidden"] = -1.0;
 
 KDInitFactions();
 
@@ -68,5 +71,39 @@ KDEventMapGeneric.postMapgen.corruptedSpawn = (e, data) => {
             DialogueCreateEnemy(randomPoint.x, randomPoint.y, enemyName);
             console.log("Corrupted faction: Created an enemy of type", enemyName);
         }
+    }
+};
+
+KDEventMapGeneric.postMapgen.corruptedMimic = (e, data) => {
+    if (KDGameData.RoomType === "" && KDMapData.Entities && KDMapData.Entities.length > 10) {
+        if (!KDMapData.Tiles || Object.keys(KDMapData.Tiles).length === 0) {
+            console.log("CorruptedDebugMimic: No tiles on map.");
+            return;
+        }
+
+        const chestTiles = Object.entries(KDMapData.Tiles).filter(([coord, tile]) => tile.Loot && typeof tile.Loot === "string" && tile.Loot == "chest" && !tile.Faction);
+
+        if (chestTiles.length === 0) {
+            console.log("CorruptedMimic: No chests on map.");
+            return;
+        }
+
+        if (KDRandom() > 0.9) {
+            console.log("CorruptedMimic: Chance is too low.");
+            return;
+        }
+
+        const randomChestIndex = Math.floor(KDRandom() * chestTiles.length);
+        const [chestCoord, chestTile] = chestTiles[randomChestIndex];
+
+        if (!chestCoord) return;
+        const [x, y] = chestCoord.split(",").map(Number);
+
+        //delete KDMapData.Tiles[chestCoord];
+        KinkyDungeonMapSet(x, y, '0');
+        console.log(`CorruptedMimic: Deleted chest of type "${chestTile.Loot}" at coordinates (${x}, ${y})`);
+
+        DialogueCreateEnemy(x, y, "CorruptedMimic");
+        console.log(`CorruptedMimic: Created enemy (${x}, ${y})`);
     }
 };

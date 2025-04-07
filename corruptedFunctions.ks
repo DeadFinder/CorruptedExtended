@@ -1,3 +1,30 @@
+// ====================================================
+//#     ___                      _     _ _             
+//#    / _ \__   _____ _ __ _ __(_) __| (_)_ __   __ _ 
+//#   | | | \ \ / / _ \ '__| '__| |/ _` | | '_ \ / _` |
+//#   | |_| |\ V /  __/ |  | |  | | (_| | | | | | (_| |
+//#    \___/  \_/ \___|_|  |_|  |_|\__,_|_|_| |_|\__, |
+//#                                              |___/ 
+// ====================================================
+// thanks to Ilyasnow
+let KDDrawTooltipOriginal = KDDrawTooltip;
+KDDrawTooltip = function KDDrawTooltip(TooltipList, ...args) {
+    let enemy = KDCurrentEnemyTooltip;
+    if (enemy && KDCanSeeEnemy(enemy) && enemy.idle && (enemy.Enemy?.name == "CorruptedMimic" || enemy.Enemy?.name == "Mimic")) {
+        console.log(enemy)
+        TooltipList = [];
+    }
+    return KDDrawTooltipOriginal(TooltipList, ...args);
+}
+
+// ================================================
+//#    _____                 _   _                 
+//#   |  ___|   _ _ __   ___| |_(_) ___  _ __  ___ 
+//#   | |_ | | | | '_ \ / __| __| |/ _ \| '_ \/ __|
+//#   |  _|| |_| | | | | (__| |_| | (_) | | | \__ \
+//#   |_|   \__,_|_| |_|\___|\__|_|\___/|_| |_|___/
+//#                                                
+// ================================================
 function SetStatTexts(statId, statName, statDesc) {
     addTextKey('KinkyDungeonStat' + statId, statName);
     addTextKey('KinkyDungeonStatDesc' + statId, statDesc);
@@ -163,6 +190,22 @@ function CreateRestraintIfNotExist(restraintName, restraintProps) {
     KinkyDungeonRefreshRestraintsCache();
 }
 
+function GetNearestEnemy(enemyName) {
+    const playerX = KinkyDungeonPlayerEntity.x;
+    const playerY = KinkyDungeonPlayerEntity.y;
+    const radius = 3;
+
+    for (const enemy of KDMapData.Entities) {
+        if (enemy.Enemy.name === enemyName) {
+            const distance = Math.abs(enemy.x - playerX) + Math.abs(enemy.y - playerY);
+            if (distance <= radius) {
+                return enemy;
+            }
+        }
+    }
+    return null;
+}
+
 const KDUtilCommon = {
     SetStatTexts,
     SetSpellText,
@@ -182,7 +225,8 @@ const KDUtilCommon = {
     CloneModel,
     GetPlayerDist,
     TryCloneRestraint,
-    CreateRestraintIfNotExist
+    CreateRestraintIfNotExist,
+    GetNearestEnemy
 };
 
 window.KDModData = window.KDModData || {};

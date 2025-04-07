@@ -1,5 +1,6 @@
 let KDUtilCommon = window.KDUtilCommon;
 const cRestraints = window.KDModData.corruptedRestraints;
+
 function ToArrayDeepSearch(startObj, arr = []) {
     for (const key of Object.keys(startObj)) {
         const val = startObj[key];
@@ -11,6 +12,89 @@ function ToArrayDeepSearch(startObj, arr = []) {
     }
     return arr;
 }
+
+// ================================================================================
+//#     ____                            _           _   __  __ _           _      
+//#    / ___|___  _ __ _ __ _   _ _ __ | |_ ___  __| | |  \/  (_)_ __ ___ (_) ___ 
+//#   | |   / _ \| '__| '__| | | | '_ \| __/ _ \/ _` | | |\/| | | '_ ` _ \| |/ __|
+//#   | |__| (_) | |  | |  | |_| | |_) | ||  __/ (_| | | |  | | | | | | | | | (__ 
+//#    \____\___/|_|  |_|   \__,_| .__/ \__\___|\__,_| |_|  |_|_|_| |_| |_|_|\___|
+//#                              |_|                                             
+// ================================================================================
+
+const corruptedMimicName = "CorruptedMimic";
+const corruptedMimicText = "Corrupted Mimic";
+
+KinkyDungeonEnemies.push({
+    name: corruptedMimicName, faction: "CorruptedHidden", blockVisionWhileStationary: true, tags: KDMapInit(["removeDoorSpawn", "ignoreharmless", "blindresist", "construct", "nosignal", "poisonresist", "soulresist", "minor", "melee", "crushweakness", "meleeresist", "fireweakness", "electricresist", "chainweakness"]),
+    evasion: -0.5, ignorechance: 1.0, armor: 1, followRange: 1, AI: "ambush", bypass: true, difficulty: 0.15, guardChance: 0,
+    nonDirectional: true,
+    //useLock: "White",
+    GFX: {
+        lighting: true,
+    },
+    maxblock: 1,
+    maxdodge: 0,
+    Sound: {
+        baseAmount: 0,
+        alertAmount: 0,
+        moveAmount: 10,
+    },
+    events: [
+        { trigger: "beforeDamage", type: "corruptedMimic" },
+    ],
+    stamina: 10,
+    visionRadius: 50, ambushRadius: 1.9, blindSight: 50, maxhp: 50, minLevel: 2, weight: -1, movePoints: 1.5, attackPoints: 2, attack: "MeleeBind", attackWidth: 1, attackRange: 1, power: 3, dmgType: "tickle", fullBoundBonus: 1,
+    terrainTags: { "rubble": 100, "adjChest": 15, "passage": 14, "illusionRage": 2, "illusionAnger": 2 }, allFloors: true, shrines: ["Illusion"],
+    dropTable: [{ name: "RedKey", weight: 1 }, { name: "Gold", amountMin: 10, amountMax: 40, weight: 6 }, { name: "ScrollArms", weight: 1 }, { name: "ScrollVerbal", weight: 1 }, { name: "ScrollLegs", weight: 1 }]
+});
+
+KDEventMapEnemy.beforeDamage.corruptedMimic = (e, enemy, data) => {
+    if (data.enemy === enemy && data.target === KinkyDungeonPlayerEntity && !data.restrainsAdded) {
+        const corruptedRestraints = [cRestraints.corruptedMummyHardSlimeFeet, cRestraints.corruptedMummyHardSlimeBoots, cRestraints.corruptedMummyHardSlimeLegs, cRestraints.corruptedMummyHardSlimeArms, cRestraints.corruptedMummyHardSlimeHands, cRestraints.corruptedMummyHardSlimeMouth, cRestraints.corruptedMummyHardSlimeHead];
+        const equippedRestraints = KinkyDungeonAllRestraint().map(inv => inv.name);
+        if (KDRandom() >= 0.9) {
+            if (enemy.hp <= 10) {
+                return;
+            }
+            KDBreakTether(KinkyDungeonPlayerEntity);
+            KDRemoveEntity(enemy);
+            KinkyDungeonPassOut();
+            KinkyDungeonAddRestraintIfWeaker(cRestraints.corruptedMimicEncasement, 0, true, "Red", false, undefined, undefined, "Corrupted", true);
+            for (const res of corruptedRestraints) {
+                if (!KDUtilCommon.PlayerWearsRestraint(res)) {
+                    KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName(res), 0, true, "", false, undefined, undefined, "Corrupted", true);
+                }
+            }
+        } else {
+            for (const restraintName of corruptedRestraints) {
+                if (equippedRestraints.includes(restraintName)) {
+                    continue;
+                }
+                let wtf = Math.min(1.0, 0.7 + (0.01 * (corruptedRestraints.indexOf(restraintName) + 1)));
+                if (KDRandom() > wtf) {
+                    KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName(restraintName), 0, true, "", false, undefined, undefined, "Corrupted", true);
+                    KinkyDungeonSendTextMessage(10, `${corruptedMimicText} binds you with ${restraintName}!`, "#cc0000", 2, true);
+                }
+                break;
+            }
+        }
+    }
+};
+
+KDUtilCommon.SetEnemyNameText(corruptedMimicName, " ");
+KDUtilCommon.SetEnemyAttackText(corruptedMimicName, `${corruptedMimicText} tickles your body...`);
+KDUtilCommon.SetEnemyAttackWithBindText(corruptedMimicName, `${corruptedMimicText} binds you with (+RestraintAdded)!`);
+KDUtilCommon.SetEnemyLockText(corruptedMimicName, `${corruptedMimicText} seals some locks your restraint!`);
+
+// ===================================================================================================
+//#     ____                            _           _      _    _      _                    _     _   
+//#    / ___|___  _ __ _ __ _   _ _ __ | |_ ___  __| |    / \  | | ___| |__   ___ _ __ ___ (_)___| |_ 
+//#   | |   / _ \| '__| '__| | | | '_ \| __/ _ \/ _` |   / _ \ | |/ __| '_ \ / _ \ '_ ` _ \| / __| __|
+//#   | |__| (_) | |  | |  | |_| | |_) | ||  __/ (_| |  / ___ \| | (__| | | |  __/ | | | | | \__ \ |_ 
+//#    \____\___/|_|  |_|   \__,_| .__/ \__\___|\__,_| /_/   \_\_|\___|_| |_|\___|_| |_| |_|_|___/\__|
+//#                              |_|                                                                  
+// ===================================================================================================
 
 function AddAlchemistSet() {
     KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName(cRestraints.corruptedAlchemistHeels + '2'), 0, true, undefined, false, undefined, undefined, "Corrupted", true);
@@ -45,7 +129,6 @@ const aRestraintsNeed = [
     cRestraints.corruptedAlchemistLeash,
 ];
 
-// Corrupted Alchemist
 KinkyDungeonEnemies.push({
     name: corruptedAlchemistName, faction: "Corrupted", bound: "Alchemist", playLine: "Alchemist", color: "#8B53E9",
     tags: KDMapInit(["nocapture", "nosub", "opendoors", "closedoors", "imprisonable", "human", "minor", "alchemist"]),
@@ -94,110 +177,6 @@ KinkyDungeonEnemies.push({
     dropTable: [{ name: "Gold", amountMin: 10, amountMax: 20, weight: 10 }]
 });
 
-// Corrupted Maid
-const corruptedMaidName = "CorruptedMaid";
-const corruptedMaidText = "Corrupted Maid";
-const corruptedMaidDomFlag = "CorruptedMaidDom";
-const dressingUpRestraint = "RopeSnakeHogtieWrist";
-let restraintsToAddMaid = [
-    "CorruptedMaidLeatherHeels",
-    "DusterGag",
-    "MaidAnkleCuffs",
-    "MaidAnkleCuffs2",
-    "LegShackles",
-    "LegShackles2",
-    "CorruptedMaidElbowShackles",
-    "MaidBelt",
-    "CorruptedMaidArmbinder",
-    "MaidVibe",
-    "MaidCBelt",
-    "CorruptedMaidNippleWeights",
-    "TrapBra",
-    "CorruptedMaidCollar",
-    "CorruptedMaidLeash",
-];
-
-KDUtilCommon.KinkyDungeonCloneEnemy("Maidforce", corruptedMaidName, {
-    playLine: "DomMaid", AI: "hunt", maxhp: 15,
-    faction: "Corrupted",
-    stealth: 2, failAttackFlag: [corruptedMaidDomFlag], ignoreFlag: [corruptedMaidDomFlag],
-    dropTable: [
-        { name: "Duster", weight: 5, ignoreInInventory: true },
-        { name: "Gold", amountMin: 15, amountMax: 25, weight: 10 }
-    ],
-    weight: -20,
-    events: [
-        { trigger: "beforeDamage", type: "corruptedMaid" },
-    ],
-    tags: KDMapInit(["nocapture", "nosub", "leashing", "tickleweakness", "imprisonable", "opendoors", "human", "melee", "corruptedMaid", "maid", "minor", "search"])
-});
-
-// Corrupted Mummy
-const corruptedMummyName = "CorruptedMummy";
-const corruptedMummyText = "Corrupted Mummy";
-
-KinkyDungeonEnemies.push({
-    name: corruptedMummyName,
-    tags: KDMapInit(["nocapture", "nosub", "leashing", "notalk", "imprisonable", "opendoors", "human", "ranged", "search"]),
-    spells: ["WitchSlimeBall", "WitchSlime", "LatexSpray"], spellCooldownMult: 1, spellCooldownMod: 0, castWhileMoving: true, stealth: 2,
-    faction: "Corrupted", outfit: "CorruptedMummy", style: "Nothing",
-    maxhp: 30, armor: 15, followRange: 1, kite: 3, AI: "hunt", dontKiteWhenDisabled: true,
-    minLevel: 0, weight: -13, movePoints: 4, attackPoints: 3, attack: "SpellMeleeBind", attackWidth: 2, attackRange: 1, power: 3, dmgType: "crush", fullBoundBonus: 1,
-    visionRadius: 7, blindSight: 10,
-    stamina: 6, preferDodge: true, maxblock: 1, maxdodge: 3,
-    terrainTags: {}, allFloors: true,
-    events: [
-        { trigger: "beforeDamage", type: "corruptedMummy" },
-    ],
-    Defeat: {
-        furnitureTags: [
-            { tags: ["shadowLatexRestraints"], count: 5 },
-            { tags: ["shadowBall"], count: 1 },
-        ],
-    },
-    effect: {
-        effect: { name: "ShadowEncase" },
-    },
-    dropTable: [
-        { name: "Duster", weight: 5, ignoreInInventory: true },
-        { name: "Gold", amountMin: 15, amountMax: 25, weight: 10 },
-        { name: "SlimeRaw", amount: 3, weight: 10 },
-        { name: "EnchKnife", ignoreInInventory: true, weight: 1 }
-    ],
-});
-
-// Corrupted Latex Cube
-const engulfFlag = "CubeEngulfed";
-const corruptedCube = "CorruptedLatexCube";
-
-KinkyDungeonEnemies.push({
-    name: corruptedCube, faction: "Latex", color: "#aa00cc",
-    tags: KDMapInit(["nocapture", "unstoppable", "slime", "latex", "latexTrap", "elite", "slashweakness", "melee", "chainimmune", "glueresist", "coldweakness", "electricresist", "pierceweakness", "acidweakness", "latexRestraints", "latexEncaseRandom"]),
-    Animations: ["squishyAmbush"],
-    GFX: {
-        AmbushSprite: "LatexCubeHidden",
-    },
-    RestraintFilter: {
-        unlimitedRestraints: true,
-    },
-    Sound: {
-        baseAmount: 0,
-        moveAmount: 3,
-    },
-    ignoreflag: [engulfFlag], failAttackflag: [engulfFlag],
-    stamina: 3,
-    squeeze: true, evasion: -1, followRange: 1, AI: "ambush",
-    visionRadius: 10.0, blindSight: 2.5, maxhp: 20, minLevel: 6, weight: 1, movePoints: 4, attackPoints: 2, attack: "MeleeBind", attackWidth: 2, attackRange: 1, power: 4, dmgType: "glue", fullBoundBonus: 2, disarm: 0.7,
-    terrainTags: { "tmb": 3, "slime": 2.5, "plant": 2, "passage": 20, "open": -10, "slimeOptOut": -0.9, "slimePref": 1 }, allFloors: true, shrines: ["Latex"],
-    events: [
-        { trigger: "afterDamageEnemy", type: "bleedEffectTile", kind: "Slime", aoe: 1.5, power: 3, chance: 1.0, duration: 20 },
-        { trigger: "afterEnemyTick", type: "createEffectTile", kind: "LatexThin", time: 25, power: 2, chance: 0.5, aoe: 0.5 },
-        { trigger: "beforeDamage", type: "cubeEngulf", power: 0, color: "#880044" },
-    ],
-    dropTable: [{ name: "Gold", amountMin: 30, amountMax: 50, weight: 1 }]
-});
-
-// Events
 KinkyDungeonSpellListEnemies.push({
     enemySpell: true, name: alchemistBindSpell, sfx: "Miss", manacost: 5,
     specialCD: 15, components: ["Arms"], level: 1, type: "bolt",
@@ -318,6 +297,57 @@ KDEventMapBuff.tickAfter[alchemistDommedFlag] = (e, buff, entity, data) => {
     }
 };
 
+KDUtilCommon.SetSpellText(alchemistBindSpell, "Bind", "The latex bottle forms a restraint on you!");
+KDUtilCommon.SetSpellText(alchemistBindSpell, "Damage", "The latex bottle splashes on you!");
+KDUtilCommon.SetEnemyNameText(corruptedAlchemistName, "Corrupted Alchemist");
+KDUtilCommon.SetEnemyAttackText(corruptedAlchemistName, `"Corrupted Alchemist" gropes your body! (DamageTaken)`);
+KDUtilCommon.SetEnemyAttackWithBindText(corruptedAlchemistName, `"Corrupted Alchemist" binds you! (+RestraintAdded)`);
+KDUtilCommon.SetEnemyLockText(corruptedAlchemistName, `"Corrupted Alchemist" locks your restraint!`);
+KDUtilCommon.SetEnemyNameText(alchemistInspectorName, alchemistInspectorText);
+KDUtilCommon.SetEnemyAttackText(alchemistInspectorName, `${alchemistInspectorText} plays with your body! (DamageTaken)`);
+KDUtilCommon.SetStatTexts(perkId, "Alchemist Pet", 'Start as an alchemist pet wandering around.');
+KDUtilCommon.SetBuffText("staminaDrain", "Stamina Locked: Your stamina won't regen. (Pet Arm Belts)");
+
+// ==========================================================================
+//#     ____                            _           _   __  __       _     _ 
+//#    / ___|___  _ __ _ __ _   _ _ __ | |_ ___  __| | |  \/  | __ _(_) __| |
+//#   | |   / _ \| '__| '__| | | | '_ \| __/ _ \/ _` | | |\/| |/ _` | |/ _` |
+//#   | |__| (_) | |  | |  | |_| | |_) | ||  __/ (_| | | |  | | (_| | | (_| |
+//#    \____\___/|_|  |_|   \__,_| .__/ \__\___|\__,_| |_|  |_|\__,_|_|\__,_|
+//#                              |_|                                         
+// ==========================================================================
+
+const corruptedMaidName = "CorruptedMaid";
+const corruptedMaidText = "Corrupted Maid";
+const corruptedMaidDomFlag = "CorruptedMaidDom";
+const dressingUpRestraint = "RopeSnakeHogtieWrist";
+let restraintsToAddMaid = [
+    "CorruptedMaidLeatherHeels",
+    "CorruptedMaidDusterGag",
+    "CorruptedMaidAnkleCuffs",
+    "CorruptedMaidLegShackles",
+    "CorruptedMaidElbowShackles",
+    "CorruptedMaidBelt",
+    "CorruptedMaidArmbinder",
+    "CorruptedMaidCollar",
+    "CorruptedMaidLeash",
+];
+
+KDUtilCommon.KinkyDungeonCloneEnemy("Maidforce", corruptedMaidName, {
+    playLine: "DomMaid", AI: "hunt", maxhp: 15,
+    faction: "Corrupted",
+    stealth: 2, failAttackFlag: [corruptedMaidDomFlag], ignoreFlag: [corruptedMaidDomFlag],
+    dropTable: [
+        { name: "Duster", weight: 5, ignoreInInventory: true },
+        { name: "Gold", amountMin: 15, amountMax: 25, weight: 10 }
+    ],
+    weight: -20,
+    events: [
+        { trigger: "beforeDamage", type: "corruptedMaid" },
+    ],
+    tags: KDMapInit(["nocapture", "nosub", "leashing", "tickleweakness", "imprisonable", "opendoors", "human", "melee", "corruptedMaid", "maid", "minor", "search"])
+});
+
 KDEventMapEnemy.beforeDamage.corruptedMaid = (e, enemy, data) => {
     if (data.enemy === enemy && data.target === KinkyDungeonPlayerEntity && !data.restrainsAdded) {
         if (KinkyDungeonFlags.get(corruptedMaidDomFlag)) return;
@@ -398,6 +428,53 @@ KDEventMapBuff.tickAfter[corruptedMaidDomFlag] = (e, buff, entity, data) => {
     }
 };
 
+KDUtilCommon.SetEnemyNameText(corruptedMaidName, corruptedMaidText);
+KDUtilCommon.SetEnemyAttackText(corruptedMaidName, `${corruptedMaidText} tickles your body...`);
+KDUtilCommon.SetEnemyAttackWithBindText(corruptedMaidName, `${corruptedMaidText} binds you with (+RestraintAdded)!`);
+KDUtilCommon.SetEnemyLockText(corruptedMaidName, `${corruptedMaidText} seals some locks your restraint!`);
+
+// ============================================================================================
+//#     ____                            _           _   __  __                                 
+//#    / ___|___  _ __ _ __ _   _ _ __ | |_ ___  __| | |  \/  |_   _ _ __ ___  _ __ ___  _   _ 
+//#   | |   / _ \| '__| '__| | | | '_ \| __/ _ \/ _` | | |\/| | | | | '_ ` _ \| '_ ` _ \| | | |
+//#   | |__| (_) | |  | |  | |_| | |_) | ||  __/ (_| | | |  | | |_| | | | | | | | | | | | |_| |
+//#    \____\___/|_|  |_|   \__,_| .__/ \__\___|\__,_| |_|  |_|\__,_|_| |_| |_|_| |_| |_|\__, |
+//#                              |_|                                                     |___/ 
+// ============================================================================================
+
+const corruptedMummyName = "CorruptedMummy";
+const corruptedMummyText = "Corrupted Mummy";
+
+KinkyDungeonEnemies.push({
+    name: corruptedMummyName,
+    tags: KDMapInit(["nocapture", "nosub", "leashing", "notalk", "imprisonable", "opendoors", "human", "ranged", "search"]),
+    spells: ["WitchSlimeBall", "WitchSlime", "LatexSpray"], spellCooldownMult: 1, spellCooldownMod: 0, castWhileMoving: true, stealth: 2,
+    faction: "Corrupted", outfit: "CorruptedMummy", style: "Nothing",
+    maxhp: 30, armor: 15, followRange: 1, kite: 3, AI: "hunt", dontKiteWhenDisabled: true,
+    minLevel: 0, weight: -13, movePoints: 4, attackPoints: 3, attack: "SpellMeleeBind", attackWidth: 2, attackRange: 1, power: 3, dmgType: "crush", fullBoundBonus: 1,
+    visionRadius: 7, blindSight: 10,
+    stamina: 6, preferDodge: true, maxblock: 1, maxdodge: 3,
+    terrainTags: {}, allFloors: true,
+    events: [
+        { trigger: "beforeDamage", type: "corruptedMummy" },
+    ],
+    Defeat: {
+        furnitureTags: [
+            { tags: ["shadowLatexRestraints"], count: 5 },
+            { tags: ["shadowBall"], count: 1 },
+        ],
+    },
+    effect: {
+        effect: { name: "ShadowEncase" },
+    },
+    dropTable: [
+        { name: "Duster", weight: 5, ignoreInInventory: true },
+        { name: "Gold", amountMin: 15, amountMax: 25, weight: 10 },
+        { name: "SlimeRaw", amount: 3, weight: 10 },
+        { name: "EnchKnife", ignoreInInventory: true, weight: 1 }
+    ],
+});
+
 KDEventMapEnemy.beforeDamage.corruptedMummy = (e, enemy, data) => {
     if (data.enemy === enemy && data.target === KinkyDungeonPlayerEntity && !data.restrainsAdded) {
         if (!KDUtilCommon.PlayerWearsRestraint("CorruptedMummyCollar")) {
@@ -409,24 +486,66 @@ KDEventMapEnemy.beforeDamage.corruptedMummy = (e, enemy, data) => {
     }
 };
 
+KDUtilCommon.SetEnemyNameText(corruptedMummyName, corruptedMummyText);
+KDUtilCommon.SetEnemyAttackText(corruptedMummyName, `${corruptedMummyText} tickles your body...`);
+KDUtilCommon.SetEnemyAttackWithBindText(corruptedMummyName, `${corruptedMummyText} binds you with (+RestraintAdded)!`);
+KDUtilCommon.SetEnemyLockText(corruptedMummyName, `${corruptedMummyText} seals some locks your restraint!`);
+
+// =====================================================================================================
+//#     ____                            _           _   _          _               ____      _          
+//#    / ___|___  _ __ _ __ _   _ _ __ | |_ ___  __| | | |    __ _| |_ _____  __  / ___|   _| |__   ___ 
+//#   | |   / _ \| '__| '__| | | | '_ \| __/ _ \/ _` | | |   / _` | __/ _ \ \/ / | |  | | | | '_ \ / _ \
+//#   | |__| (_) | |  | |  | |_| | |_) | ||  __/ (_| | | |__| (_| | ||  __/>  <  | |__| |_| | |_) |  __/
+//#    \____\___/|_|  |_|   \__,_| .__/ \__\___|\__,_| |_____\__,_|\__\___/_/\_\  \____\__,_|_.__/ \___|
+//#                              |_|                                                                    
+// =====================================================================================================
+
+const engulfFlag = "CubeEngulfed";
+const corruptedCube = "CorruptedLatexCube";
+
+KinkyDungeonEnemies.push({
+    name: corruptedCube, faction: "Latex", color: "#aa00cc",
+    tags: KDMapInit(["nocapture", "unstoppable", "slime", "latex", "latexTrap", "elite", "slashweakness", "melee", "chainimmune", "glueresist", "coldweakness", "electricresist", "pierceweakness", "acidweakness", "latexRestraints", "latexEncaseRandom"]),
+    Animations: ["squishyAmbush"],
+    GFX: {
+        AmbushSprite: "LatexCubeHidden",
+    },
+    RestraintFilter: {
+        unlimitedRestraints: true,
+    },
+    Sound: {
+        baseAmount: 0,
+        moveAmount: 3,
+    },
+    ignoreflag: [engulfFlag], failAttackflag: [engulfFlag],
+    stamina: 3,
+    squeeze: true, evasion: -1, followRange: 1, AI: "ambush",
+    visionRadius: 10.0, blindSight: 2.5, maxhp: 20, minLevel: 6, weight: 1, movePoints: 4, attackPoints: 2, attack: "MeleeBind", attackWidth: 2, attackRange: 1, power: 4, dmgType: "glue", fullBoundBonus: 2, disarm: 0.7,
+    terrainTags: { "tmb": 3, "slime": 2.5, "plant": 2, "passage": 20, "open": -10, "slimeOptOut": -0.9, "slimePref": 1 }, allFloors: true, shrines: ["Latex"],
+    events: [
+        { trigger: "afterDamageEnemy", type: "bleedEffectTile", kind: "Slime", aoe: 1.5, power: 3, chance: 1.0, duration: 20 },
+        { trigger: "afterEnemyTick", type: "createEffectTile", kind: "LatexThin", time: 25, power: 2, chance: 0.5, aoe: 0.5 },
+        { trigger: "beforeDamage", type: "cubeEngulf", power: 0, color: "#880044" },
+    ],
+    dropTable: [{ name: "Gold", amountMin: 30, amountMax: 50, weight: 1 }]
+});
+
 KDEventMapEnemy.beforeDamage.cubeEngulf = (e, enemy, data) => {
     const totalSlimeRestraints = KDUtilCommon.RestraintWithEnemyTagCount("latexEncaseRandom");
-    if (data.enemy === enemy && data.target === KinkyDungeonPlayerEntity && data.restraintsAdded && data.restraintsAdded.length === 0 && totalSlimeRestraints > 3 && !KinkyDungeonFlags.get(engulfFlag)) {
+    if (data.enemy === enemy && data.target === KinkyDungeonPlayerEntity && /*data.restraintsAdded && data.restraintsAdded.length === 0 &&*/ totalSlimeRestraints > 3 && !KinkyDungeonFlags.get(engulfFlag)) {
         KDTripleBuffKill("CubeEngulf", KinkyDungeonPlayerEntity, 9, (tt) => {
             KinkyDungeonSetDress("SlimeDress", "SlimeDress");
             KDBreakTether(KinkyDungeonPlayerEntity);
+            KDRemoveEntity(enemy);
 
-            enemy.hp = 0;
             KinkyDungeonRemoveRestraintsWithShrine("Slime");
             KinkyDungeonRemoveRestraintsWithShrine("SlimeHard");
             KinkyDungeonRemoveRestraintsWithShrine("Latex");
 
             KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName(cRestraints.corruptedCubeEncasement), 0, true, undefined, false, undefined, undefined, "Corrupted", true);
             KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName(cRestraints.corruptedCubeCuffs), 0, true, undefined, false, undefined, undefined, "Corrupted", true);
-            KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName(cRestraints.corruptedCubeCollar), 0, true, undefined, false, undefined, undefined, "Corrupted", true);
-            KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName(cRestraints.corruptedCubeAnkles), 0, true, undefined, false, undefined, undefined, "Corrupted", true);
-            KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName(cRestraints.corruptedCubeLegs), 0, true, undefined, false, undefined, undefined, "Corrupted", true);
-            KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName(cRestraints.corruptedCubeGag), 0, true, undefined, false, undefined, undefined, "Corrupted", true);
+            KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName(cRestraints.corruptedCubeBallGag), 0, true, undefined, false, undefined, undefined, "Corrupted", true);
+            KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName(cRestraints.corruptedCubeLeash), 0, true, undefined, false, undefined, undefined, "Corrupted", true);
             KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName(cRestraints.corruptedCubeBlindfold), 0, true, undefined, false, undefined, undefined, "Corrupted", true);
         }, "Blindness");
     }
@@ -435,12 +554,11 @@ KDEventMapEnemy.beforeDamage.cubeEngulf = (e, enemy, data) => {
 KDEventMapInventory.postRemoval.RequireEncasement = (e, item, data) => {
     if (data.item === item) {
         for (let inv of KinkyDungeonAllRestraint()) {
-            if (inv.name === cRestraints.corruptedCubeEncasement) {
+            if (inv && inv.name && inv.name === cRestraints.corruptedCubeEncasement) {
                 return;
             }
         }
         KinkyDungeonExpireBuff(KinkyDungeonPlayerEntity, engulfFlag);
-        KinkyDungeonSendTextMessage(4, "The cube melts away and you break free!", "lightgreen", 2);
     }
 };
 
@@ -480,31 +598,20 @@ KDEventMapBuff.tickAfter[engulfFlag] = (e, buff, entity, data) => {
             }
         }
     } else {
-        KinkyDungeonSendTextMessage(5, "The slime melted out and you break free.", "#9074ab", 10);
+        KinkyDungeonExpireBuff(KinkyDungeonPlayerEntity, engulfFlag);
+        DialogueCreateEnemy(KinkyDungeonPlayerEntity.x, KinkyDungeonPlayerEntity.y, corruptedCube);
+        KDNearbyEnemies(KinkyDungeonPlayerEntity.x, KinkyDungeonPlayerEntity.y, 3).forEach(enemy => {
+            if (enemy.Enemy.name == corruptedCube) {
+                enemy.hp = 10;
+                enemy.stun = 5;
+            }
+        });
+        KinkyDungeonSendTextMessage(4, "The cube not interested in you more and you are free for now..", "lightgreen", 2);
         KinkyDungeonRemoveRestraintsWithName(cRestraints.corruptedCubeEncasement);
         KinkyDungeonUnlockRestraintsWithShrine("AfterLeashDone");
     }
 };
 
-// Text
-KDUtilCommon.SetSpellText(alchemistBindSpell, "Bind", "The latex bottle forms a restraint on you!");
-KDUtilCommon.SetSpellText(alchemistBindSpell, "Damage", "The latex bottle splashes on you!");
-KDUtilCommon.SetEnemyNameText(corruptedAlchemistName, "Corrupted Alchemist");
-KDUtilCommon.SetEnemyAttackText(corruptedAlchemistName, `"Corrupted Alchemist" gropes your body! (DamageTaken)`);
-KDUtilCommon.SetEnemyAttackWithBindText(corruptedAlchemistName, `"Corrupted Alchemist" binds you! (+RestraintAdded)`);
-KDUtilCommon.SetEnemyLockText(corruptedAlchemistName, `"Corrupted Alchemist" locks your restraint!`);
-KDUtilCommon.SetEnemyNameText(alchemistInspectorName, alchemistInspectorText);
-KDUtilCommon.SetEnemyAttackText(alchemistInspectorName, `${alchemistInspectorText} plays with your body! (DamageTaken)`);
-KDUtilCommon.SetStatTexts(perkId, "Alchemist Pet", 'Start as an alchemist pet wandering around.');
-KDUtilCommon.SetBuffText("staminaDrain", "Stamina Locked: Your stamina won't regen. (Pet Arm Belts)");
-KDUtilCommon.SetEnemyNameText(corruptedMaidName, corruptedMaidText);
-KDUtilCommon.SetEnemyAttackText(corruptedMaidName, `${corruptedMaidText} tickles your body...`);
-KDUtilCommon.SetEnemyAttackWithBindText(corruptedMaidName, `${corruptedMaidText} binds you with (+RestraintAdded)!`);
-KDUtilCommon.SetEnemyLockText(corruptedMaidName, `${corruptedMaidText} seals some locks your restraint!`);
-KDUtilCommon.SetEnemyNameText(corruptedMummyName, corruptedMummyText);
-KDUtilCommon.SetEnemyAttackText(corruptedMummyName, `${corruptedMummyText} tickles your body...`);
-KDUtilCommon.SetEnemyAttackWithBindText(corruptedMummyName, `${corruptedMummyText} binds you with (+RestraintAdded)!`);
-KDUtilCommon.SetEnemyLockText(corruptedMummyName, `${corruptedMummyText} seals some locks your restraint!`);
 KDUtilCommon.SetEnemyNameText(corruptedCube, "Corrupted Latex Cube");
 KDUtilCommon.SetEnemyAttackText(corruptedCube, "Corrupted Latex Cube gropes around your body...");
 KDUtilCommon.SetEnemyAttackWithBindText(corruptedCube, "Corrupted Latex Cube spits some slime on you!");
