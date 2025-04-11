@@ -116,9 +116,23 @@ AddModel({
     Group: "Devices",
     Restraint: true,
     Categories: ["Furniture"],
-    AddPose: ["HandsBehind", "FeetLinked", "LieDown"],
+    AddPose: ["HandsBehind", "FeetLinked"],
     Layers: ToLayerMap([
         { Name: "CorruptedMimicEncasement1", Layer: "FurnitureFront", Pri: -40, Invariant: true },
         { Name: "CorruptedMimicEncasement2", Layer: "FurnitureBack", Pri: 40, Invariant: true },
+    ])
+});
+
+AddModel({
+    Name: "CorruptedCursedEpicenterEncasement",
+    Folder: "Furniture",
+    TopLevel: true,
+    Group: "Devices",
+    Restraint: true,
+    Categories: ["Furniture"],
+    AddPose: ["UprightHogtie", "ForceKneel"],
+    Layers: ToLayerMap([
+        { Name: "CorruptedEpicenterEncasement1", Layer: "FurnitureFront", Pri: -40, Invariant: true },
+        { Name: "CorruptedEpicenterEncasement2", Layer: "FurnitureBack", Pri: 40, Invariant: true },
     ])
 });

@@ -2,6 +2,8 @@ let KDUtilCommon = window.KDUtilCommon;
 const cRestraints = {
     // Mimic
     corruptedMimicEncasement: "CorruptedMimicEncasement",
+    // CursedEpicenter
+    corruptedCursedEpicenterEncasement: "CorruptedCursedEpicenterEncasement",
     // Mummy
     corruptedMummyHardSlimeFeet: "CorruptedHardSlimeFeet",
     corruptedMummyHardSlimeBoots: "CorruptedHardSlimeBoots",
@@ -57,6 +59,8 @@ KinkyDungeonRestraints.push({
     enemyTags: { "corruptedmimic": 100 }, playerTags: {}, minLevel: 0, allFloors: true, shrine: ["Furniture"], ignoreSpells: true,
     events: [
         { trigger: "tick", type: "cageDebuff", inheritLinked: true },
+        { trigger: "tick", type: "PeriodicTeasing", power: 1, time: 12, edgeOnly: false, cooldown: { "normal": 120, "tease": 50 }, chance: 0.02 },
+        { trigger: "tick", type: "PeriodicDenial", power: 1, time: 28, edgeOnly: false, cooldown: { "normal": 120, "tease": 50 }, chance: 0.02 },
         { trigger: "postRemoval", type: "mimicEncasement" }
     ]
 });
@@ -71,11 +75,92 @@ KDEventMapInventory.postRemoval.mimicEncasement = (e, item, data) => {
         DialogueCreateEnemy(KinkyDungeonPlayerEntity.x, KinkyDungeonPlayerEntity.y, "CorruptedMimic");
         KDNearbyEnemies(KinkyDungeonPlayerEntity.x, KinkyDungeonPlayerEntity.y, 3).forEach(enemy => {
             if (enemy.Enemy.name == "CorruptedMimic") {
-                enemy.hp = 10;
+                enemy.hp = enemy.Enemy.maxhp / 2;
                 enemy.stun = 10;
                 KinkyDungeonSendTextMessage(4, "The mimic spits you out away and now you are free!", "lightgreen", 2);
             }
         });
+    }
+};
+
+// ===============================================================================
+//#    _____       _                _               ____                        _ 
+//#   | ____|_ __ (_) ___ ___ _ __ | |_ ___ _ __   / ___|   _ _ __ ___  ___  __| |
+//#   |  _| | '_ \| |/ __/ _ \ '_ \| __/ _ \ '__| | |  | | | | '__/ __|/ _ \/ _` |
+//#   | |___| |_) | | (_|  __/ | | | ||  __/ |    | |__| |_| | |  \__ \  __/ (_| |
+//#   |_____| .__/|_|\___\___|_| |_|\__\___|_|     \____\__,_|_|  |___/\___|\__,_|
+//#         |_|                                                                   
+// ===============================================================================
+
+KinkyDungeonRestraints.push({
+    removePrison: true, name: cRestraints.corruptedCursedEpicenterEncasement, Asset: "SmallWoodenBox", Model: cRestraints.corruptedCursedEpicenterEncasement,
+    Color: ["#ba50eb"], Group: "ItemDevices", power: 3, weight: 1, immobile: true, alwaysStruggleable: true,
+    DefaultLock: "Red", removeOnLeash: false,
+    escapeChance: { "Struggle": -0.5, "Cut": -0.5, "Remove": 0.35, "Pick": -1, "Unlock": -1 },
+    helpChance: { "Remove": 0.5, "Pick": 0.5, "Unlock": 1.0 },
+    enemyTags: {}, playerTags: {}, minLevel: 0, allFloors: true, shrine: ["Furniture", "Cursed", "Shadow"], ignoreSpells: true,
+    events: [
+        { trigger: "tick", type: "PeriodicTeasing", power: 1, time: 12, edgeOnly: false, cooldown: { "normal": 60, "tease": 20 }, chance: 0.02 },
+        { trigger: "tick", type: "PeriodicDenial", power: 1, time: 36, edgeOnly: false, cooldown: { "normal": 60, "tease": 20 }, chance: 0.02 },
+        { trigger: "tick", type: "PeriodicTeasing", power: 3, time: 16, edgeOnly: false, cooldown: { "normal": 60, "tease": 20 }, chance: 0.02 },
+        { trigger: "tick", type: "cageDebuff", inheritLinked: true },
+        { trigger: "tick", type: "corruptedEpicenterCursedEncasement" },
+        { trigger: "postRemoval", type: "corruptedEpicenterCursedRequireEncasement" },
+    ]
+});
+
+KDEventMapInventory.postRemoval.corruptedEpicenterCursedRequireEncasement = (e, item, data) => {
+    if (data.item === item) {
+        for (let inv of KinkyDungeonAllRestraint()) {
+            if (inv && inv.name && inv.name === cRestraints.corruptedCursedEpicenterEncasement) {
+                return;
+            }
+        }
+        KinkyDungeonExpireBuff(KinkyDungeonPlayerEntity, "EpicenterEngulfed");
+    }
+};
+
+KDEventMapInventory.tick.corruptedEpicenterCursedEncasement = (e, item, data) => {
+    if (!KinkyDungeonHasBuff(KinkyDungeonPlayerBuffs, "EpicenterEngulfed")) {
+        KinkyDungeonApplyBuffToEntity(KinkyDungeonPlayerEntity, {
+            id: "EpicenterEngulfed", type: "Flag", duration: 55, power: 1, maxCount: 1, currentCount: 1, tags: ["attack", "cast"],
+            events: [
+                { type: "EpicenterEngulfed", trigger: "tickAfter" }
+            ]
+        });
+    }
+};
+
+KDBuffSprites["EpicenterEngulfed"] = true;
+
+KDEventMapBuff.tickAfter["EpicenterEngulfed"] = (e, buff, entity, data) => {
+    if (entity.player) {
+        if (buff.duration > 0) {
+            if (buff.duration < 45) {
+                KinkyDungeonSendTextMessage(5, "Cursed Epicenter moves around with you!", "#9074ab", 10);
+                let nearbyPoint = KinkyDungeonGetNearbyPoint(entity.x, entity.y, true, null, true, true);
+                if (nearbyPoint) {
+                    KinkyDungeonMoveTo(nearbyPoint.x, nearbyPoint.y, false, false, true, false);
+                }
+            }
+        } else {
+            if (KDRandom() < 0.5) {
+                KinkyDungeonExpireBuff(KinkyDungeonPlayerEntity, "EpicenterEngulfed");
+                DialogueCreateEnemy(KinkyDungeonPlayerEntity.x, KinkyDungeonPlayerEntity.y, "EpicenterCursed");
+                KDNearbyEnemies(KinkyDungeonPlayerEntity.x, KinkyDungeonPlayerEntity.y, 3).forEach(enemy => {
+                    if (enemy.Enemy.name == "EpicenterCursed") {
+                        enemy.hp = enemy.Enemy.maxhp / 2;
+                        enemy.stun = 10;
+                    }
+                });
+                KinkyDungeonSendTextMessage(4, "The epicenter cursed released you for now..", "lightgreen", 2);
+                KinkyDungeonRemoveRestraintsWithName(cRestraints.corruptedCursedEpicenterEncasement);
+                KinkyDungeonUnlockRestraintsWithShrine("AfterLeashDone");
+            } else {
+                buff.duration = 40;
+                KinkyDungeonSendTextMessage(4, "The epicenter cursed not wanted to release you..", "#9074ab", 2);
+            }
+        }
     }
 };
 
@@ -688,14 +773,69 @@ KinkyDungeonRestraints.push({
     events: [
         { trigger: "tick", type: "cageDebuff", inheritLinked: true },
         { trigger: "tick", type: "cubeEncasement" },
-        { trigger: "postRemoval", type: "RequireEncasement" }
+        { trigger: "postRemoval", type: "corruptedCubeRequireEncasement" }
     ]
 });
+
+KDEventMapInventory.postRemoval.corruptedCubeRequireEncasement = (e, item, data) => {
+    if (data.item === item) {
+        for (let inv of KinkyDungeonAllRestraint()) {
+            if (inv && inv.name && inv.name === cRestraints.corruptedCubeEncasement) {
+                return;
+            }
+        }
+        KinkyDungeonExpireBuff(KinkyDungeonPlayerEntity, "CubeEngulfed");
+    }
+};
+
+KDEventMapInventory.tick.cubeEncasement = (e, item, data) => {
+    if (!KinkyDungeonHasBuff(KinkyDungeonPlayerBuffs, "CubeEngulfed")) {
+        KinkyDungeonApplyBuffToEntity(KinkyDungeonPlayerEntity, {
+            id: "CubeEngulfed", type: "Flag", duration: 55, power: 1, maxCount: 1, currentCount: 1, tags: ["attack", "cast"],
+            events: [
+                { type: "CubeEngulfed", trigger: "tickAfter" }
+            ]
+        });
+    }
+};
+
+KDBuffSprites["CubeEngulfed"] = true;
+
+KDEventMapBuff.tickAfter["CubeEngulfed"] = (e, buff, entity, data) => {
+    if (entity.player) {
+        if (buff.duration > 0) {
+                if (buff.duration < 45 && KDRandom() < 0.35) {
+                    KinkyDungeonSendTextMessage(5, "Corrupted slime moves around with you!", "#9074ab", 10);
+                    let nearbyPoint = KinkyDungeonGetNearbyPoint(entity.x, entity.y, true, null, true, true);
+                    if (nearbyPoint) {
+                        KinkyDungeonMoveTo(nearbyPoint.x, nearbyPoint.y, false, false, true, false);
+                    }
+                }
+        } else {
+            KinkyDungeonExpireBuff(KinkyDungeonPlayerEntity, "CubeEngulfed");
+            DialogueCreateEnemy(KinkyDungeonPlayerEntity.x, KinkyDungeonPlayerEntity.y, corruptedCube);
+            KDNearbyEnemies(KinkyDungeonPlayerEntity.x, KinkyDungeonPlayerEntity.y, 3).forEach(enemy => {
+                if (enemy.Enemy.name == corruptedCube) {
+                    enemy.hp = 10;
+                    enemy.stun = 5;
+                }
+            });
+            KinkyDungeonSendTextMessage(4, "The cube not interested in you more and you are free for now..", "lightgreen", 2);
+            KinkyDungeonRemoveRestraintsWithName(cRestraints.corruptedCubeEncasement);
+            KinkyDungeonUnlockRestraintsWithShrine("AfterLeashDone");
+        }
+    }
+};
 
 // Mimic
 KinkyDungeonAddRestraintText(cRestraints.corruptedMimicEncasement, "Corrupted Mimic",
     "Mimic has been swallowed you..",
     "Really hard to escape from alive mimic!");
+
+// Epicenter Cursed
+KinkyDungeonAddRestraintText(cRestraints.corruptedCursedEpicenterEncasement, "Epicenter Cursed",
+    "Epicenter engulfed you..",
+    "Now you are just a toy flying around..\nMaybe after some time it will release you?",);
 
 // Mummy
 KinkyDungeonAddRestraintText(cRestraints.corruptedMummyCollar, "Corrupted Mummy Collar",

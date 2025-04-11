@@ -69,7 +69,7 @@ KDEventMapGeneric.postMapgen.corruptedSpawn = (e, data) => {
 
         if (iters < 50) {
             DialogueCreateEnemy(randomPoint.x, randomPoint.y, enemyName);
-            console.log("Corrupted faction: Created an enemy of type", enemyName);
+            //console.log("Corrupted faction: Created an enemy of type", enemyName);
         }
     }
 };
@@ -77,19 +77,19 @@ KDEventMapGeneric.postMapgen.corruptedSpawn = (e, data) => {
 KDEventMapGeneric.postMapgen.corruptedMimic = (e, data) => {
     if (KDGameData.RoomType === "" && KDMapData.Entities && KDMapData.Entities.length > 10) {
         if (!KDMapData.Tiles || Object.keys(KDMapData.Tiles).length === 0) {
-            console.log("CorruptedDebugMimic: No tiles on map.");
+            //console.log("CorruptedDebugMimic: No tiles on map.");
             return;
         }
 
         const chestTiles = Object.entries(KDMapData.Tiles).filter(([coord, tile]) => tile.Loot && typeof tile.Loot === "string" && tile.Loot == "chest" && !tile.Faction);
 
         if (chestTiles.length === 0) {
-            console.log("CorruptedMimic: No chests on map.");
+            //console.log("CorruptedMimic: No chests on map.");
             return;
         }
 
-        if (KDRandom() > 0.9) {
-            console.log("CorruptedMimic: Chance is too low.");
+        if (KDRandom() < 0.9) {
+            //console.log("CorruptedMimic: Chance is too low.");
             return;
         }
 
@@ -101,9 +101,9 @@ KDEventMapGeneric.postMapgen.corruptedMimic = (e, data) => {
 
         //delete KDMapData.Tiles[chestCoord];
         KinkyDungeonMapSet(x, y, '0');
-        console.log(`CorruptedMimic: Deleted chest of type "${chestTile.Loot}" at coordinates (${x}, ${y})`);
+        //console.log(`CorruptedMimic: Deleted chest of type "${chestTile.Loot}" at coordinates (${x}, ${y})`);
 
         DialogueCreateEnemy(x, y, "CorruptedMimic");
-        console.log(`CorruptedMimic: Created enemy (${x}, ${y})`);
+        //console.log(`CorruptedMimic: Created enemy (${x}, ${y})`);
     }
 };

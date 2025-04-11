@@ -34,6 +34,10 @@ function SetSpellText(name, type, text) {
     addTextKey(`KinkyDungeonSpell${name}${type}`, text);
 }
 
+function SetSpellCastText(name, text) {
+    addTextKey(`KinkyDungeonSpellCast${name}`, text);
+}
+
 function SetLinkText(name, text) {
     addTextKey(`KinkyDungeonLink${name}`, text);
 }
@@ -111,6 +115,29 @@ function HasRestraintWithShrines(...shrines) {
         }
     }
     return false;
+}
+
+function AmountRestraintWithShrine(shrine) {
+    let restraintWithShrineCount = 0;
+    for (const r of KinkyDungeonAllRestraint()) {
+        let rest = KDRestraint(r);
+        if (rest?.shrine && rest?.shrine.includes(shrine)) {
+            restraintWithShrineCount += 1;
+            continue;
+        }
+        let dynamicLink = r.dynamicLink;
+        let loop = 0;
+        while (dynamicLink && loop < 12) {
+            rest = KDRestraint(dynamicLink);
+            if (rest?.shrine && rest?.shrine.includes(shrine)) {
+                restraintWithShrineCount += 1;
+                continue;
+            }
+            dynamicLink = dynamicLink.dynamicLink;
+            loop++;
+        }
+    }
+    return restraintWithShrineCount;
 }
 
 function PlayerWearsRestraint(restraintName) {
@@ -209,6 +236,7 @@ function GetNearestEnemy(enemyName) {
 const KDUtilCommon = {
     SetStatTexts,
     SetSpellText,
+    SetSpellCastText,
     SetLinkText,
     SetUnlinkText,
     SetEnemyLockText,
@@ -220,6 +248,7 @@ const KDUtilCommon = {
     SetTripleBuffTexts,
     RestraintWithEnemyTagCount,
     HasRestraintWithShrines,
+    AmountRestraintWithShrine,
     PlayerWearsRestraint,
     KinkyDungeonCloneEnemy,
     CloneModel,

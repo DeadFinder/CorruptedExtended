@@ -44,7 +44,7 @@ KinkyDungeonEnemies.push({
         { trigger: "beforeDamage", type: "corruptedMimic" },
     ],
     stamina: 10,
-    visionRadius: 50, ambushRadius: 1.9, blindSight: 50, maxhp: 50, minLevel: 2, weight: -1, movePoints: 1.5, attackPoints: 2, attack: "MeleeBind", attackWidth: 1, attackRange: 1, power: 3, dmgType: "tickle", fullBoundBonus: 1,
+    visionRadius: 50, ambushRadius: 1.9, blindSight: 50, maxhp: 10, minLevel: 2, weight: -1, movePoints: 1.5, attackPoints: 2, attack: "MeleeBind", attackWidth: 1, attackRange: 1, power: 3, dmgType: "tickle", fullBoundBonus: 1,
     terrainTags: { "rubble": 100, "adjChest": 15, "passage": 14, "illusionRage": 2, "illusionAnger": 2 }, allFloors: true, shrines: ["Illusion"],
     dropTable: [{ name: "RedKey", weight: 1 }, { name: "Gold", amountMin: 10, amountMax: 40, weight: 6 }, { name: "ScrollArms", weight: 1 }, { name: "ScrollVerbal", weight: 1 }, { name: "ScrollLegs", weight: 1 }]
 });
@@ -86,6 +86,112 @@ KDUtilCommon.SetEnemyNameText(corruptedMimicName, " ");
 KDUtilCommon.SetEnemyAttackText(corruptedMimicName, `${corruptedMimicText} tickles your body...`);
 KDUtilCommon.SetEnemyAttackWithBindText(corruptedMimicName, `${corruptedMimicText} binds you with (+RestraintAdded)!`);
 KDUtilCommon.SetEnemyLockText(corruptedMimicName, `${corruptedMimicText} seals some locks your restraint!`);
+
+// ===============================================================================
+//#    _____       _                _               ____                        _ 
+//#   | ____|_ __ (_) ___ ___ _ __ | |_ ___ _ __   / ___|   _ _ __ ___  ___  __| |
+//#   |  _| | '_ \| |/ __/ _ \ '_ \| __/ _ \ '__| | |  | | | | '__/ __|/ _ \/ _` |
+//#   | |___| |_) | | (_|  __/ | | | ||  __/ |    | |__| |_| | |  \__ \  __/ (_| |
+//#   |_____| .__/|_|\___\___|_| |_|\__\___|_|     \____\__,_|_|  |___/\___|\__,_|
+//#         |_|                                                                   
+// ===============================================================================
+
+{const index = KinkyDungeonEnemies.findIndex(enemy => enemy.name === "EpicenterCursed");
+if (index !== -1) KinkyDungeonEnemies.splice(index, 1);
+const index2 = KinkyDungeonEnemies.findIndex(enemy => enemy.name === "EpicenterCursed2");
+if (index2 !== -1) KinkyDungeonEnemies.splice(index2, 1);}
+
+KinkyDungeonEnemies.push({
+    name: "EpicenterCursed", faction: "Curse", color: "#880044",
+    tags: KDMapInit(["opendoors", "epicenterCursed", "epicenter", "curseTrap", "ghost", "cursed", "soulimmune", "melee", "fireweakness", "shadowimmune", "glueimmune", "chainimmune", "shadowHands", "poisonimmune", "meleeresist", "flying"]),
+    ignorechance: 0, armor: 0, followRange: 1, AI: "huntshadow", noAlert: true, hitsfx: "Evil",
+    ethereal: true,
+    spells: ["ManyShadowHands", "ManyObsidianBolts", "CorruptedCursingCircle"/*"CursingCircle", "CursingCircle"*/], spellCooldownMult: 1.1, spellCooldownMod: 0, castWhileMoving: true,
+    visionRadius: 15, blindSight: 8, evasion: -2, maxhp: 61.7, minLevel: 0, weight: 0,
+    movePoints: 4, attackPoints: 2, attack: "Spell",
+    attackWidth: 1, attackRange: 1, power: 1.0, dmgType: "cold", fullBoundBonus: 4,
+    regen: 0.02,
+    maxblock: 0,
+    maxdodge: 0,
+    stamina: 2,
+    events: [
+        { trigger: "addEntity", type: "EpicenterAssignHP" },
+        { trigger: "beforeDamage", type: "epicenterCursed" },
+    ],
+    terrainTags: { "curseTrap": 10 }, shrines: [], allFloors: true,
+    dropTable: [{ name: "ManaOrb", weight: 1 }],
+    },
+    {
+        name: "EpicenterCursed2", faction: "Curse", color: "#a4affa",
+        tags: KDMapInit(["opendoors", "epicenterCursed", "epicenter", "curseTrap", "ghost", "cursed", "soulimmune", "melee", "fireweakness", "shadowimmune", "glueimmune", "chainimmune", "shadowHands", "poisonimmune", "meleeresist", "flying"]),
+        ignorechance: 0, armor: 0, followRange: 1, AI: "huntshadow", noAlert: true, hitsfx: "Evil",
+        ethereal: true,
+        spells: ["ManyShadowHands", "ManyMithrilBolts", "CorruptedCursingCircle"/*"CursingCircle2", "CursingCircle2"*/], spellCooldownMult: 1.1, spellCooldownMod: 0, castWhileMoving: true,
+        visionRadius: 15, blindSight: 8, evasion: -2, maxhp: 61.7, minLevel: 0, weight: 0,
+        movePoints: 4, attackPoints: 2, attack: "Spell",
+        attackWidth: 1, attackRange: 1, power: 1.0, dmgType: "cold", fullBoundBonus: 4,
+        regen: 0.02,
+        maxblock: 0,
+        maxdodge: 0,
+        stamina: 2,
+        events: [
+            { trigger: "addEntity", type: "EpicenterAssignHP" },
+            { trigger: "beforeDamage", type: "epicenterCursed" },
+        ],
+        terrainTags: { "curseTrap": 10 }, shrines: [], allFloors: true,
+        dropTable: [{ name: "ManaOrb", weight: 1 }],
+},);
+
+KinkyDungeonSpellListEnemies.push(
+    {enemySpell: true, name: "CorruptedCursingCircle", color: KDBaseRed, minRange: 0, sfx: "Fwoosh", bulletSpin: 0.1, specialCD: 12,
+        selfcast: true, noTerrainHit: true,
+        manacost: 4, components: ["Verbal"], level:1, type:"inert", onhit:"aoe", time: 4, delay: 3, power: 4, range: 7, size: 5, aoe: 2.5, lifetime: 1, damage: "soul",
+        //playerEffect: {name: "CursingCircle", count: 1, kind: "cursedCollar", power: 3.5, damage: "soul", time: 40},
+        events: [
+            {trigger: "bulletTick", type: "CorruptedCursingCircle", aoe: 2.5, power: 0.01},
+		],
+    },
+);
+
+KDEventMapBullet.bulletTick.CorruptedCursingCircle = (e, b, data) => {
+    if (KDUtilCommon.PlayerWearsRestraint(cRestraints.corruptedCursedEpicenterEncasement) || KDUtilCommon.AmountRestraintWithShrine("Shadow") < 5 || b.time > 1) return;
+    if (KDistChebyshev(KinkyDungeonPlayerEntity.x - b.x, KinkyDungeonPlayerEntity.y - b.y) <= e.aoe) {
+        let enemies = KDNearbyEnemies(KinkyDungeonPlayerEntity.x, KinkyDungeonPlayerEntity.y, e.aoe);
+        const equippedRestraints = KinkyDungeonAllRestraint();
+
+        KDBreakTether(KinkyDungeonPlayerEntity);
+        KinkyDungeonPassOut(true);
+        KinkyDungeonAddRestraintIfWeaker(cRestraints.corruptedCursedEpicenterEncasement, 0, true, "Red", false, undefined, undefined, "Corrupted", true);
+
+        for (const enemy of enemies) {
+            if (enemy.Enemy.name === "EpicenterCursed") {
+                KinkyDungeonAddRestraintIfWeaker("CursedCollar", 15, true, "Red", false, undefined, undefined, "Corrupted", true);
+                KDRemoveEntity(enemy);
+                break;
+            } else if (enemy.Enemy.name === "EpicenterCursed2") {
+                KinkyDungeonAddRestraintIfWeaker("CursedCollar2", 15, true, "Red", false, undefined, undefined, "Corrupted", true);
+                KDRemoveEntity(enemy);
+                break;
+            }
+        }
+
+        for (const restraint of equippedRestraints) {
+            if (restraint) {
+                if (restraint.name && (restraint.name === "CursedCollar" || restraint.name === "CursedCollar2" || restraint.name === cRestraints.corruptedCursedEpicenterEncasement)) continue;
+                if (restraint.curse && restraint.curse === "CursedDamage") continue;
+                if (KDRandom() > 0.8) {
+                    restraint.curse = "CursedDamage";
+                    if (KDRandom() > 0.7) {
+                        continue;
+                    }
+                    break;
+                }
+            }
+        }
+    }
+}
+
+KDUtilCommon.SetSpellCastText("CorruptedCursingCircle", "Epicenter Cursed casts the circle of curse!");
 
 // ===================================================================================================
 //#     ____                            _           _      _    _      _                    _     _   
@@ -548,67 +654,6 @@ KDEventMapEnemy.beforeDamage.cubeEngulf = (e, enemy, data) => {
             KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName(cRestraints.corruptedCubeLeash), 0, true, undefined, false, undefined, undefined, "Corrupted", true);
             KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName(cRestraints.corruptedCubeBlindfold), 0, true, undefined, false, undefined, undefined, "Corrupted", true);
         }, "Blindness");
-    }
-};
-
-KDEventMapInventory.postRemoval.RequireEncasement = (e, item, data) => {
-    if (data.item === item) {
-        for (let inv of KinkyDungeonAllRestraint()) {
-            if (inv && inv.name && inv.name === cRestraints.corruptedCubeEncasement) {
-                return;
-            }
-        }
-        KinkyDungeonExpireBuff(KinkyDungeonPlayerEntity, engulfFlag);
-    }
-};
-
-KDEventMapInventory.tick.cubeEncasement = (e, item, data) => {
-    if (!KinkyDungeonHasBuff(KinkyDungeonPlayerBuffs, engulfFlag)) {
-        KinkyDungeonApplyBuffToEntity(KinkyDungeonPlayerEntity, {
-            id: engulfFlag, type: "Flag", duration: 55, power: 1, maxCount: 1, currentCount: 1, tags: ["attack", "cast"],
-            events: [
-                { type: engulfFlag, trigger: "tickAfter" }
-            ]
-        });
-    }
-};
-
-let cBuffOptions = {
-    id: engulfFlag,
-    aura: "#000000",
-    type: engulfFlag,
-    power: 1,
-    player: true,
-    enemies: false,
-    tags: ["CubeEngulfBuff"],
-    duration: 55
-};
-
-KDBuffSprites[engulfFlag] = true;
-
-KDEventMapBuff.tickAfter[engulfFlag] = (e, buff, entity, data) => {
-    if (buff.duration > 0) {
-        if (entity.player) {
-            if (buff.duration < 45 && KDRandom() < 0.35) {
-                KinkyDungeonSendTextMessage(5, "Corrupted slime moves around with you!", "#9074ab", 10);
-                let nearbyPoint = KinkyDungeonGetNearbyPoint(entity.x, entity.y, true, null, true, true);
-                if (nearbyPoint) {
-                    KinkyDungeonMoveTo(nearbyPoint.x, nearbyPoint.y, false, false, true, false);
-                }
-            }
-        }
-    } else {
-        KinkyDungeonExpireBuff(KinkyDungeonPlayerEntity, engulfFlag);
-        DialogueCreateEnemy(KinkyDungeonPlayerEntity.x, KinkyDungeonPlayerEntity.y, corruptedCube);
-        KDNearbyEnemies(KinkyDungeonPlayerEntity.x, KinkyDungeonPlayerEntity.y, 3).forEach(enemy => {
-            if (enemy.Enemy.name == corruptedCube) {
-                enemy.hp = 10;
-                enemy.stun = 5;
-            }
-        });
-        KinkyDungeonSendTextMessage(4, "The cube not interested in you more and you are free for now..", "lightgreen", 2);
-        KinkyDungeonRemoveRestraintsWithName(cRestraints.corruptedCubeEncasement);
-        KinkyDungeonUnlockRestraintsWithShrine("AfterLeashDone");
     }
 };
 
