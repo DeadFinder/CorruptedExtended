@@ -22,33 +22,35 @@ KinkyDungeonFactionRelationsBase["Player"]["CorruptedHidden"] = -1.0;
 
 KDInitFactions();
 
+let CorruptedEnemiesEnabled = window.KDCorruptedExtendedSettings;
+
 KDEventMapGeneric.postMapgen.corruptedSpawn = (e, data) => {
     if (KDGameData.RoomType === "" && KDMapData.Entities && KDMapData.Entities.length > 10) {
-        let totalMaidCount = 0;
-        let totalAlchemistCount = 0;
-        let totalMummyCount = 0;
+        if (CorruptedEnemiesEnabled["CorruptedMaid"]) { let totalMaidCount = 0;}
+        if (CorruptedEnemiesEnabled["CorruptedAlchemist"]) { let totalAlchemistCount = 0;}
+        if (CorruptedEnemiesEnabled["CorruptedMummy"]) { let totalMummyCount = 0;}
 
         for (const entity of KDMapData.Entities) {
-            if (entity.Enemy?.tags?.maid) {
+            if (CorruptedEnemiesEnabled["CorruptedMaid"] && entity.Enemy?.tags?.maid) {
                 totalMaidCount++;
             }
-            if (entity.Enemy?.tags?.alchemist) {
+            if (CorruptedEnemiesEnabled["CorruptedAlchemist"] && entity.Enemy?.tags?.alchemist) {
                 totalAlchemistCount++;
             }
-            if (entity.Enemy?.tags?.mummy) {
+            if (CorruptedEnemiesEnabled["CorruptedMummy"] && entity.Enemy?.tags?.mummy) {
                 totalMummyCount++;
             }
         }
 
-        if (totalMaidCount > 0 && totalMaidCount < 10) {
+        if (CorruptedEnemiesEnabled["CorruptedMaid"] && totalMaidCount > 0 && totalMaidCount < 10) {
             for (let i = 0; i < Math.floor(KDRandom()) + 1; i++) {
                 tryCreateEnemy("CorruptedMaid");
             }
         }
-        if (totalAlchemistCount > 0 && totalAlchemistCount < 10) {
+        if (CorruptedEnemiesEnabled["CorruptedAlchemist"] && totalAlchemistCount > 0 && totalAlchemistCount < 10) {
             tryCreateEnemy("CorruptedAlchemist");
         }
-        if (totalMummyCount > 0 && totalMummyCount < 10) {
+        if (CorruptedEnemiesEnabled["CorruptedMummy"] && totalMummyCount > 0 && totalMummyCount < 10) {
             tryCreateEnemy("CorruptedMummy");
         }
     }
@@ -75,7 +77,7 @@ KDEventMapGeneric.postMapgen.corruptedSpawn = (e, data) => {
 };
 
 KDEventMapGeneric.postMapgen.corruptedMimic = (e, data) => {
-    if (KDGameData.RoomType === "" && KDMapData.Entities && KDMapData.Entities.length > 10) {
+    if (CorruptedEnemiesEnabled["CorruptedMimic"] && KDGameData.RoomType === "" && KDMapData.Entities && KDMapData.Entities.length > 10) {
         if (!KDMapData.Tiles || Object.keys(KDMapData.Tiles).length === 0) {
             //console.log("CorruptedDebugMimic: No tiles on map.");
             return;

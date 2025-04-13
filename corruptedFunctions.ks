@@ -1,3 +1,97 @@
+// ==============================================================
+//#    __  __           _   ____       _   _   _                 
+//#   |  \/  | ___   __| | / ___|  ___| |_| |_(_)_ __   __ _ ___ 
+//#   | |\/| |/ _ \ / _` | \___ \ / _ \ __| __| | '_ \ / _` / __|
+//#   | |  | | (_) | (_| |  ___) |  __/ |_| |_| | | | | (_| \__ \
+//#   |_|  |_|\___/ \__,_| |____/ \___|\__|\__|_|_| |_|\__, |___/
+//#                                                    |___/     
+// ==============================================================
+// Thanks again Ilyasnow for he's code in UsefulTooltips
+let ModName = "CorruptedExtended";
+addTextKey("KDModButton"+ModName, "Corrupted Extended");
+addTextKey("KDModButton"+ModName+"ExplanationText", "Select what enemies you want or don't want to appear.\nMaybe requires game restart.\nAlready exists enemies on map will not be removed.");
+addTextKey("KDModButton"+ModName+"CorruptedMimic", "Corrupted Mimic");
+addTextKey("KDModButton"+ModName+"CorruptedEpicenterCursed", "Reworked Epicenter Cursed");
+addTextKey("KDModButton"+ModName+"CorruptedAlchemist", "Corrupted Alchemist");
+addTextKey("KDModButton"+ModName+"CorruptedMaid", "Corrupted Maid");
+addTextKey("KDModButton"+ModName+"CorruptedMummy", "Corrupted Mummy");
+addTextKey("KDModButton"+ModName+"CorruptedLatexCube", "Corrupted Latex Cube");
+
+if (KDEventMapGeneric['afterModSettingsLoad'] != undefined) {
+  KDEventMapGeneric['afterModSettingsLoad'][ModName] = (e, data) => {
+	if (KDModSettings == null) { 
+	  KDModSettings = {} 
+	};
+	if (KDModConfigs != undefined) {
+	  KDModConfigs[ModName] = [
+		{
+			type: "text",
+			refvar: ModName+"ExplanationText",
+		},
+		{
+			type: "boolean",
+			refvar: ModName+"CorruptedMimic",
+			default: true,
+		},
+        {
+			type: "boolean",
+			refvar: ModName+"CorruptedEpicenterCursed",
+			default: true,
+		},
+        {
+			type: "boolean",
+			refvar: ModName+"CorruptedAlchemist",
+			default: true,
+		},
+        {
+			type: "boolean",
+			refvar: ModName+"CorruptedMaid",
+			default: true,
+		},
+        {
+			type: "boolean",
+			refvar: ModName+"CorruptedMummy",
+			default: true,
+		},
+        {
+			type: "boolean",
+			refvar: ModName+"CorruptedLatexCube",
+			default: true,
+		},
+	  ]
+	}
+	let settingsobject = (KDModSettings.hasOwnProperty(ModName) == false) ? {} : Object.assign({}, KDModSettings[ModName]);
+	KDModConfigs[ModName].forEach((option) => {
+	  if (settingsobject[option.refvar] == undefined) {
+		settingsobject[option.refvar] = option.default
+	  }
+	})
+	KDModSettings[ModName] = settingsobject;
+	AfterModLoad();
+  }
+}
+
+if (KDEventMapGeneric['afterModConfig'] != undefined) {
+  KDEventMapGeneric['afterModConfig'][ModName] = (e, data) => {
+	AfterModLoad();
+  }
+}
+
+function AfterModLoad() {
+	//console.log("Corrupted Extended - Enemies enabled:");
+	for (let entry of KDModConfigs[ModName]) {
+		if (entry.type == "boolean") {
+            let name = entry.refvar;
+            if (name.startsWith(ModName))
+                name = name.substring(ModName.length);
+            CorruptedEnemiesEnabled[name] = KDModSettings[ModName][entry.refvar];
+			//console.log(`${name} = ${CorruptedEnemiesEnabled[name]}`);
+        }
+	}
+}
+
+let CorruptedEnemiesEnabled = {};
+window.KDCorruptedExtendedSettings = CorruptedEnemiesEnabled;
 // ====================================================
 //#     ___                      _     _ _             
 //#    / _ \__   _____ _ __ _ __(_) __| (_)_ __   __ _ 

@@ -1,5 +1,6 @@
 let KDUtilCommon = window.KDUtilCommon;
 const cRestraints = window.KDModData.corruptedRestraints;
+let CorruptedEnemiesEnabled = window.KDCorruptedExtendedSettings;
 
 function ToArrayDeepSearch(startObj, arr = []) {
     for (const key of Object.keys(startObj)) {
@@ -21,7 +22,6 @@ function ToArrayDeepSearch(startObj, arr = []) {
 //#    \____\___/|_|  |_|   \__,_| .__/ \__\___|\__,_| |_|  |_|_|_| |_| |_|_|\___|
 //#                              |_|                                             
 // ================================================================================
-
 const corruptedMimicName = "CorruptedMimic";
 const corruptedMimicText = "Corrupted Mimic";
 
@@ -95,104 +95,107 @@ KDUtilCommon.SetEnemyLockText(corruptedMimicName, `${corruptedMimicText} seals s
 //#   |_____| .__/|_|\___\___|_| |_|\__\___|_|     \____\__,_|_|  |___/\___|\__,_|
 //#         |_|                                                                   
 // ===============================================================================
-
-{const index = KinkyDungeonEnemies.findIndex(enemy => enemy.name === "EpicenterCursed");
-if (index !== -1) KinkyDungeonEnemies.splice(index, 1);
-const index2 = KinkyDungeonEnemies.findIndex(enemy => enemy.name === "EpicenterCursed2");
-if (index2 !== -1) KinkyDungeonEnemies.splice(index2, 1);}
-
-KinkyDungeonEnemies.push({
-    name: "EpicenterCursed", faction: "Curse", color: "#880044",
-    tags: KDMapInit(["opendoors", "epicenterCursed", "epicenter", "curseTrap", "ghost", "cursed", "soulimmune", "melee", "fireweakness", "shadowimmune", "glueimmune", "chainimmune", "shadowHands", "poisonimmune", "meleeresist", "flying"]),
-    ignorechance: 0, armor: 0, followRange: 1, AI: "huntshadow", noAlert: true, hitsfx: "Evil",
-    ethereal: true,
-    spells: ["ManyShadowHands", "ManyObsidianBolts", "CorruptedCursingCircle"/*"CursingCircle", "CursingCircle"*/], spellCooldownMult: 1.1, spellCooldownMod: 0, castWhileMoving: true,
-    visionRadius: 15, blindSight: 8, evasion: -2, maxhp: 61.7, minLevel: 0, weight: 0,
-    movePoints: 4, attackPoints: 2, attack: "Spell",
-    attackWidth: 1, attackRange: 1, power: 1.0, dmgType: "cold", fullBoundBonus: 4,
-    regen: 0.02,
-    maxblock: 0,
-    maxdodge: 0,
-    stamina: 2,
-    events: [
-        { trigger: "addEntity", type: "EpicenterAssignHP" },
-        { trigger: "beforeDamage", type: "epicenterCursed" },
-    ],
-    terrainTags: { "curseTrap": 10 }, shrines: [], allFloors: true,
-    dropTable: [{ name: "ManaOrb", weight: 1 }],
-    },
+if (CorruptedEnemiesEnabled["CorruptedEpicenterCursed"]) {
     {
-        name: "EpicenterCursed2", faction: "Curse", color: "#a4affa",
-        tags: KDMapInit(["opendoors", "epicenterCursed", "epicenter", "curseTrap", "ghost", "cursed", "soulimmune", "melee", "fireweakness", "shadowimmune", "glueimmune", "chainimmune", "shadowHands", "poisonimmune", "meleeresist", "flying"]),
-        ignorechance: 0, armor: 0, followRange: 1, AI: "huntshadow", noAlert: true, hitsfx: "Evil",
-        ethereal: true,
-        spells: ["ManyShadowHands", "ManyMithrilBolts", "CorruptedCursingCircle"/*"CursingCircle2", "CursingCircle2"*/], spellCooldownMult: 1.1, spellCooldownMod: 0, castWhileMoving: true,
-        visionRadius: 15, blindSight: 8, evasion: -2, maxhp: 61.7, minLevel: 0, weight: 0,
-        movePoints: 4, attackPoints: 2, attack: "Spell",
-        attackWidth: 1, attackRange: 1, power: 1.0, dmgType: "cold", fullBoundBonus: 4,
-        regen: 0.02,
-        maxblock: 0,
-        maxdodge: 0,
-        stamina: 2,
-        events: [
-            { trigger: "addEntity", type: "EpicenterAssignHP" },
-            { trigger: "beforeDamage", type: "epicenterCursed" },
-        ],
-        terrainTags: { "curseTrap": 10 }, shrines: [], allFloors: true,
-        dropTable: [{ name: "ManaOrb", weight: 1 }],
-},);
+    const index = KinkyDungeonEnemies.findIndex(enemy => enemy.name === "EpicenterCursed");
+    if (index !== -1) KinkyDungeonEnemies.splice(index, 1);
+    const index2 = KinkyDungeonEnemies.findIndex(enemy => enemy.name === "EpicenterCursed2");
+    if (index2 !== -1) KinkyDungeonEnemies.splice(index2, 1);
+    }
 
-KinkyDungeonSpellListEnemies.push(
-    {enemySpell: true, name: "CorruptedCursingCircle", color: KDBaseRed, minRange: 0, sfx: "Fwoosh", bulletSpin: 0.1, specialCD: 12,
-        selfcast: true, noTerrainHit: true,
-        manacost: 4, components: ["Verbal"], level:1, type:"inert", onhit:"aoe", time: 4, delay: 3, power: 4, range: 7, size: 5, aoe: 2.5, lifetime: 1, damage: "soul",
-        //playerEffect: {name: "CursingCircle", count: 1, kind: "cursedCollar", power: 3.5, damage: "soul", time: 40},
-        events: [
-            {trigger: "bulletTick", type: "CorruptedCursingCircle", aoe: 2.5, power: 0.01},
-		],
-    },
-);
+    KinkyDungeonEnemies.push({
+            name: "EpicenterCursed", faction: "Curse", color: "#880044",
+            tags: KDMapInit(["opendoors", "epicenterCursed", "epicenter", "curseTrap", "ghost", "cursed", "soulimmune", "melee", "fireweakness", "shadowimmune", "glueimmune", "chainimmune", "shadowHands", "poisonimmune", "meleeresist", "flying"]),
+            ignorechance: 0, armor: 0, followRange: 1, AI: "huntshadow", noAlert: true, hitsfx: "Evil",
+            ethereal: true,
+            spells: ["ManyShadowHands", "ManyObsidianBolts", "CorruptedCursingCircle"/*"CursingCircle", "CursingCircle"*/], spellCooldownMult: 1.1, spellCooldownMod: 0, castWhileMoving: true,
+            visionRadius: 15, blindSight: 8, evasion: -2, maxhp: 61.7, minLevel: 0, weight: 0,
+            movePoints: 4, attackPoints: 2, attack: "Spell",
+            attackWidth: 1, attackRange: 1, power: 1.0, dmgType: "cold", fullBoundBonus: 4,
+            regen: 0.02,
+            maxblock: 0,
+            maxdodge: 0,
+            stamina: 2,
+            events: [
+                { trigger: "addEntity", type: "EpicenterAssignHP" },
+                { trigger: "beforeDamage", type: "epicenterCursed" },
+            ],
+            terrainTags: { "curseTrap": 10 }, shrines: [], allFloors: true,
+            dropTable: [{ name: "ManaOrb", weight: 1 }],
+        },
+        {
+            name: "EpicenterCursed2", faction: "Curse", color: "#a4affa",
+            tags: KDMapInit(["opendoors", "epicenterCursed", "epicenter", "curseTrap", "ghost", "cursed", "soulimmune", "melee", "fireweakness", "shadowimmune", "glueimmune", "chainimmune", "shadowHands", "poisonimmune", "meleeresist", "flying"]),
+            ignorechance: 0, armor: 0, followRange: 1, AI: "huntshadow", noAlert: true, hitsfx: "Evil",
+            ethereal: true,
+            spells: ["ManyShadowHands", "ManyMithrilBolts", "CorruptedCursingCircle"/*"CursingCircle2", "CursingCircle2"*/], spellCooldownMult: 1.1, spellCooldownMod: 0, castWhileMoving: true,
+            visionRadius: 15, blindSight: 8, evasion: -2, maxhp: 61.7, minLevel: 0, weight: 0,
+            movePoints: 4, attackPoints: 2, attack: "Spell",
+            attackWidth: 1, attackRange: 1, power: 1.0, dmgType: "cold", fullBoundBonus: 4,
+            regen: 0.02,
+            maxblock: 0,
+            maxdodge: 0,
+            stamina: 2,
+            events: [
+                { trigger: "addEntity", type: "EpicenterAssignHP" },
+                { trigger: "beforeDamage", type: "epicenterCursed" },
+            ],
+            terrainTags: { "curseTrap": 10 }, shrines: [], allFloors: true,
+            dropTable: [{ name: "ManaOrb", weight: 1 }],
+        },
+    );
 
-KDEventMapBullet.bulletTick.CorruptedCursingCircle = (e, b, data) => {
-    if (KDUtilCommon.PlayerWearsRestraint(cRestraints.corruptedCursedEpicenterEncasement) || KDUtilCommon.AmountRestraintWithShrine("Shadow") < 5 || b.time > 1) return;
-    if (KDistChebyshev(KinkyDungeonPlayerEntity.x - b.x, KinkyDungeonPlayerEntity.y - b.y) <= e.aoe) {
-        let enemies = KDNearbyEnemies(KinkyDungeonPlayerEntity.x, KinkyDungeonPlayerEntity.y, e.aoe);
-        const equippedRestraints = KinkyDungeonAllRestraint();
+    KinkyDungeonSpellListEnemies.push(
+        {
+            enemySpell: true, name: "CorruptedCursingCircle", color: KDBaseRed, minRange: 0, sfx: "Fwoosh", bulletSpin: 0.1, specialCD: 12,
+            selfcast: true, noTerrainHit: true,
+            manacost: 4, components: ["Verbal"], level: 1, type: "inert", onhit: "aoe", time: 4, delay: 3, power: 4, range: 7, size: 5, aoe: 2.5, lifetime: 1, damage: "soul",
+            //playerEffect: {name: "CursingCircle", count: 1, kind: "cursedCollar", power: 3.5, damage: "soul", time: 40},
+            events: [
+                { trigger: "bulletTick", type: "CorruptedCursingCircle", aoe: 2.5, power: 0.01 },
+            ],
+        },
+    );
 
-        KDBreakTether(KinkyDungeonPlayerEntity);
-        KinkyDungeonPassOut(true);
-        KinkyDungeonAddRestraintIfWeaker(cRestraints.corruptedCursedEpicenterEncasement, 0, true, "Red", false, undefined, undefined, "Corrupted", true);
+    KDEventMapBullet.bulletTick.CorruptedCursingCircle = (e, b, data) => {
+        if (KDUtilCommon.PlayerWearsRestraint(cRestraints.corruptedCursedEpicenterEncasement) || KDUtilCommon.AmountRestraintWithShrine("Shadow") < 5 || b.time > 1) return;
+        if (KDistChebyshev(KinkyDungeonPlayerEntity.x - b.x, KinkyDungeonPlayerEntity.y - b.y) <= e.aoe) {
+            let enemies = KDNearbyEnemies(KinkyDungeonPlayerEntity.x, KinkyDungeonPlayerEntity.y, e.aoe);
+            const equippedRestraints = KinkyDungeonAllRestraint();
 
-        for (const enemy of enemies) {
-            if (enemy.Enemy.name === "EpicenterCursed") {
-                KinkyDungeonAddRestraintIfWeaker("CursedCollar", 15, true, "Red", false, undefined, undefined, "Corrupted", true);
-                KDRemoveEntity(enemy);
-                break;
-            } else if (enemy.Enemy.name === "EpicenterCursed2") {
-                KinkyDungeonAddRestraintIfWeaker("CursedCollar2", 15, true, "Red", false, undefined, undefined, "Corrupted", true);
-                KDRemoveEntity(enemy);
-                break;
-            }
-        }
+            KDBreakTether(KinkyDungeonPlayerEntity);
+            KinkyDungeonPassOut(true);
+            KinkyDungeonAddRestraintIfWeaker(cRestraints.corruptedCursedEpicenterEncasement, 0, true, "Red", false, undefined, undefined, "Corrupted", true);
 
-        for (const restraint of equippedRestraints) {
-            if (restraint) {
-                if (restraint.name && (restraint.name === "CursedCollar" || restraint.name === "CursedCollar2" || restraint.name === cRestraints.corruptedCursedEpicenterEncasement)) continue;
-                if (restraint.curse && restraint.curse === "CursedDamage") continue;
-                if (KDRandom() > 0.8) {
-                    restraint.curse = "CursedDamage";
-                    if (KDRandom() > 0.7) {
-                        continue;
-                    }
+            for (const enemy of enemies) {
+                if (enemy.Enemy.name === "EpicenterCursed") {
+                    KinkyDungeonAddRestraintIfWeaker("CursedCollar", 15, true, "Red", false, undefined, undefined, "Corrupted", true);
+                    KDRemoveEntity(enemy);
                     break;
+                } else if (enemy.Enemy.name === "EpicenterCursed2") {
+                    KinkyDungeonAddRestraintIfWeaker("CursedCollar2", 15, true, "Red", false, undefined, undefined, "Corrupted", true);
+                    KDRemoveEntity(enemy);
+                    break;
+                }
+            }
+
+            for (const restraint of equippedRestraints) {
+                if (restraint) {
+                    if (restraint.name && (restraint.name === "CursedCollar" || restraint.name === "CursedCollar2" || restraint.name === cRestraints.corruptedCursedEpicenterEncasement)) continue;
+                    if (restraint.curse && restraint.curse === "CursedDamage") continue;
+                    if (KDRandom() > 0.8) {
+                        restraint.curse = "CursedDamage";
+                        if (KDRandom() > 0.7) {
+                            continue;
+                        }
+                        break;
+                    }
                 }
             }
         }
     }
+    KDUtilCommon.SetSpellCastText("CorruptedCursingCircle", "Epicenter Cursed casts the circle of curse!");
 }
-
-KDUtilCommon.SetSpellCastText("CorruptedCursingCircle", "Epicenter Cursed casts the circle of curse!");
-
 // ===================================================================================================
 //#     ____                            _           _      _    _      _                    _     _   
 //#    / ___|___  _ __ _ __ _   _ _ __ | |_ ___  __| |    / \  | | ___| |__   ___ _ __ ___ (_)___| |_ 
@@ -211,7 +214,6 @@ function AddAlchemistSet() {
 }
 
 window.AddAlchemistSet = AddAlchemistSet;
-
 const corruptedAlchemistName = "CorruptedAlchemist";
 const alchemistInspectorName = "AlchemistInspector";
 const alchemistInspectorText = "Alchemist Inspector";
