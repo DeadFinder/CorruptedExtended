@@ -26,18 +26,18 @@ let CorruptedEnemiesEnabled = window.KDCorruptedExtendedSettings;
 
 KDEventMapGeneric.postMapgen.corruptedSpawn = (e, data) => {
     if (KDGameData.RoomType === "" && KDMapData.Entities && KDMapData.Entities.length > 10) {
-        if (CorruptedEnemiesEnabled["CorruptedMaid"]) { let totalMaidCount = 0;}
-        if (CorruptedEnemiesEnabled["CorruptedAlchemist"]) { let totalAlchemistCount = 0;}
-        if (CorruptedEnemiesEnabled["CorruptedMummy"]) { let totalMummyCount = 0;}
+        let totalMaidCount = 0;
+        let totalAlchemistCount = 0;
+        let totalMummyCount = 0;
 
         for (const entity of KDMapData.Entities) {
-            if (CorruptedEnemiesEnabled["CorruptedMaid"] && entity.Enemy?.tags?.maid) {
+            if (entity.Enemy?.tags?.maid) {
                 totalMaidCount++;
             }
-            if (CorruptedEnemiesEnabled["CorruptedAlchemist"] && entity.Enemy?.tags?.alchemist) {
+            if (entity.Enemy?.tags?.alchemist) {
                 totalAlchemistCount++;
             }
-            if (CorruptedEnemiesEnabled["CorruptedMummy"] && entity.Enemy?.tags?.mummy) {
+            if (entity.Enemy?.tags?.mummy) {
                 totalMummyCount++;
             }
         }
