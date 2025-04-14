@@ -1,39 +1,76 @@
-name: Create Release ZIP
+name: Auto Release from mod.json
 
 on:
   push:
-    tags:
-      - 'v*'
+    branches:
+      - main
+    paths:
+      - 'mod.json'
 
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: Install jq
+      run: sudo apt-get update && sudo apt-get install -y jq
+
+    - name: Read version and modname from mod.json
+      id: get_mod_info
+      run: |
+        VERSION=$(jq -r '.modbuild' mod.json)
+        MODNAME=$(jq -r '.modname' mod.json | sed 's/ //g')  # Удаляем пробелы из имени
+        echo "VERSION=v$VERSION" >> $GITHUB_ENV
+        echo "MODNAME=$MODNAME" >> $GITHUB_ENV
+
+    - name: Check if tag exists
+      id: check_tag
+      run: |
+        if git rev-parse "${{ env.VERSION }}" >/dev/null 2>&1; then
+          echo "Tag ${{ env.VERSION }} already exists, skipping tag creation."
+          echo "TAG_EXISTS=true" >> $GITHUB_ENV
+        else
+          echo "TAG_EXISTS=false" >> $GITHUB_ENV
+        fi
+
+    - name: Create and push tag
+      if: env.TAG_EXISTS == 'false'
+      run: |
+        git config user.name "GitHub Actions"
+        git config user.email "actions@github.com"
+        git tag ${{ env.VERSION }}
+        git push origin ${{ env.VERSION }}
 
     - name: Create ZIP archive
+      if: env.TAG_EXISTS == 'false'
       run: |
-        # Create a ZIP archive from the repository, respecting .gitattributes
-        git archive --format=zip --output=Corrupted_Extended_Release_${{ github.ref_name }}.zip HEAD
+        # Create a ZIP archive with modname and version
+        git archive --format=zip --output=${{ env.MODNAME }}-${{ env.VERSION }}.zip HEAD
 
     - name: Create Release
+      id: create_release
+      if: env.TAG_EXISTS == 'false'
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
+        tag_name: ${{ env.VERSION }}
+        release_name: Release ${{ env.VERSION }}
         draft: false
         prerelease: false
 
     - name: Upload ZIP to Release
+      if: env.TAG_EXISTS == 'false'
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ steps.create-release.outputs.upload_url }}
-        asset_path: ./mod-release.zip
-        asset_name: mod-release.zip
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./${{ env.MODNAME }}-${{ env.VERSION }}.zip
+        asset_name: ${{ env.MODNAME }}-${{ env.VERSION }}.zip
         asset_content_type: application/zip
