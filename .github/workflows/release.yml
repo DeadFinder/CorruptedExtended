@@ -15,7 +15,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
-        fetch-depth: 0  # Полная история для работы с тегами
+        fetch-depth: 0
 
     - name: Install jq
       run: sudo apt-get update && sudo apt-get install -y jq
@@ -40,8 +40,8 @@ jobs:
     - name: Check if tag exists
       id: check_tag
       run: |
-        if git rev-parse "${{ env.VERSION }}" >/dev/null 2>&1; then
-          echo "Tag ${{ env.VERSION }} already exists, skipping tag creation."
+        if git rev-parse "Stable_${{ env.VERSION }}" >/dev/null 2>&1; then
+          echo "Tag Stable_${{ env.VERSION }} already exists, skipping tag creation."
           echo "TAG_EXISTS=true" >> $GITHUB_ENV
         else
           echo "TAG_EXISTS=false" >> $GITHUB_ENV
@@ -59,8 +59,8 @@ jobs:
     - name: Create ZIP archive
       if: env.TAG_EXISTS == 'false'
       run: |
-        echo "Creating ZIP archive: ${{ env.MODNAME }}_Stable_${{ env.VERSION }}.zip"
-        git archive --format=zip --output=${{ env.MODNAME }}_Stable_${{ env.VERSION }}.zip HEAD
+        echo "Creating ZIP archive: ${{ env.MODNAME }}_${{ env.VERSION }}.zip"
+        git archive --format=zip --output=${{ env.MODNAME }}_${{ env.VERSION }}.zip HEAD
 
     - name: Create Release
       id: create_release
@@ -69,7 +69,7 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ env.VERSION }}
+        tag_name: Stable_${{ env.VERSION }}
         release_name: Stable v${{ env.VERSION }}
         draft: false
         prerelease: false
@@ -81,6 +81,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./${{ env.MODNAME }}_Stable_${{ env.VERSION }}.zip
-        asset_name: ${{ env.MODNAME }}_Stable_${{ env.VERSION }}.zip
+        asset_path: ./${{ env.MODNAME }}_${{ env.VERSION }}.zip
+        asset_name: ${{ env.MODNAME }}_${{ env.VERSION }}.zip
         asset_content_type: application/zip
