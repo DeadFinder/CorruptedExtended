@@ -15,7 +15,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
-        fetch-depth: 0  # Полная история для работы с тегами
+        fetch-depth: 0
 
     - name: Install jq and gnupg
       run: sudo apt-get update && sudo apt-get install -y jq gnupg
@@ -70,8 +70,8 @@ jobs:
         GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
         GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
       run: |
-        git config user.name "GitHub Actions"
-        git config user.email "actions@github.com"
+        git config user.name "Sergey"
+        git config user.email "mrgameonline_cheat@bk.ru"
         git config user.signingkey "$GPG_KEY_ID"
         git config gpg.program gpg
         echo "Creating signed tag Stable_${{ env.VERSION }}"
@@ -79,6 +79,11 @@ jobs:
         git tag -s Stable_${{ env.VERSION }} -m "Release Stable_${{ env.VERSION }}" || { echo "Failed to create signed tag"; exit 1; }
         echo "Pushing tag Stable_${{ env.VERSION }}"
         git push origin Stable_${{ env.VERSION }} || { echo "Failed to push tag"; exit 1; }
+
+    - name: Verify tag signature
+      if: env.TAG_EXISTS == 'false'
+      run: |
+        git tag -v Stable_${{ env.VERSION }} || { echo "Tag verification failed"; exit 1; }
 
     - name: Create ZIP archive
       if: env.TAG_EXISTS == 'false'
