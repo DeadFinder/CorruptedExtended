@@ -15,7 +15,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
-        fetch-depth: 0
+        fetch-depth: 0  # Полная история для работы с тегами
 
     - name: Install jq
       run: sudo apt-get update && sudo apt-get install -y jq
@@ -23,10 +23,19 @@ jobs:
     - name: Read version and modname from mod.json
       id: get_mod_info
       run: |
+        if [ ! -f mod.json ]; then
+          echo "Error: mod.json not found"
+          exit 1
+        fi
         VERSION=$(jq -r '.modbuild' mod.json)
-        MODNAME=$(jq -r '.modname' mod.json | sed 's/ //g')  # Удаляем пробелы из имени
-        echo "VERSION=v$VERSION" >> $GITHUB_ENV
+        if [ -z "$VERSION" ]; then
+          echo "Error: modbuild is empty or not found in mod.json"
+          exit 1
+        fi
+        MODNAME="CorruptedExtended_Stable"
+        echo "VERSION=$VERSION" >> $GITHUB_ENV
         echo "MODNAME=$MODNAME" >> $GITHUB_ENV
+        echo "Read mod.json: MODNAME=$MODNAME, VERSION=$VERSION"
 
     - name: Check if tag exists
       id: check_tag
@@ -43,14 +52,15 @@ jobs:
       run: |
         git config user.name "GitHub Actions"
         git config user.email "actions@github.com"
-        git tag ${{ env.VERSION }}
-        git push origin ${{ env.VERSION }}
+        git tag Stable_${{ env.VERSION }}
+        echo "Pushing tag Stable_${{ env.VERSION }}"
+        git push origin Stable_${{ env.VERSION }} || { echo "Failed to push tag"; exit 1; }
 
     - name: Create ZIP archive
       if: env.TAG_EXISTS == 'false'
       run: |
-        # Create a ZIP archive with modname and version
-        git archive --format=zip --output=${{ env.MODNAME }}-${{ env.VERSION }}.zip HEAD
+        echo "Creating ZIP archive: ${{ env.MODNAME }}_Stable_${{ env.VERSION }}.zip"
+        git archive --format=zip --output=${{ env.MODNAME }}_Stable_${{ env.VERSION }}.zip HEAD
 
     - name: Create Release
       id: create_release
@@ -60,7 +70,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: ${{ env.VERSION }}
-        release_name: Release ${{ env.VERSION }}
+        release_name: Stable v${{ env.VERSION }}
         draft: false
         prerelease: false
 
@@ -71,6 +81,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./${{ env.MODNAME }}-${{ env.VERSION }}.zip
-        asset_name: ${{ env.MODNAME }}-${{ env.VERSION }}.zip
+        asset_path: ./${{ env.MODNAME }}_Stable_${{ env.VERSION }}.zip
+        asset_name: ${{ env.MODNAME }}_Stable_${{ env.VERSION }}.zip
         asset_content_type: application/zip
