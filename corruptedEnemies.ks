@@ -210,7 +210,7 @@ function AddAlchemistSet() {
     ToArrayDeepSearch(aRestraintsNeed).forEach(val => KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName(val), 0, true, undefined, false, undefined, undefined, undefined, true));
     //KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName(cRestraints.corruptedAlchemistHeels + '2'));
     KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName(cRestraints.corruptedAlchemistHeels + '2'), 0, true, undefined, false, undefined, undefined, "Corrupted", true);
-    KinkyDungeonSetDress(petDressName, petDressName);
+    KinkyDungeonSetDress(CorruptedAlchemistPetDress, CorruptedAlchemistPetDress);
 }
 
 window.AddAlchemistSet = AddAlchemistSet;
@@ -226,7 +226,7 @@ const alchemistBindSpell = "AmpulePurple";
 const drainStaminaCost = 20;
 const petRestraintTag = "AlchemistPet";
 const petRestraintWithSpellTag = "AlchemistSpell";
-const petDressName = "AlchemistPet";
+const CorruptedAlchemistPetDress = "AlchemistPet";
 const perkId = "AlchemistPet";
 const aRestraintsNeed = [
     cRestraints.corruptedAlchemistCorset,
@@ -340,9 +340,9 @@ KDEventMapEnemy.beforeDamage[alchemistDomFlag] = (e, enemy, data) => {
             if (KDGameData.PrisonerState !== 'parole') {
                 KDGameData.PrisonerState = 'parole';
                 KinkyDungeonPassOut(true);
-                KinkyDungeonSetDress(petDressName, petDressName);
-                if (!KinkyDungeonInventoryGet(petDressName)) {
-                    let outfit = { name: petDressName, id: KinkyDungeonGetItemID(), type: "Outfit" };
+                KinkyDungeonSetDress(CorruptedAlchemistPetDress, CorruptedAlchemistPetDress);
+                if (!KinkyDungeonInventoryGet(CorruptedAlchemistPetDress)) {
+                    let outfit = { name: CorruptedAlchemistPetDress, id: KinkyDungeonGetItemID(), type: "Outfit" };
                     KinkyDungeonInventoryAdd(outfit);
                 }
             }
@@ -398,7 +398,7 @@ KDEventMapEnemy.afterEnemyTick[alchemistDomRefreshFlag] = (e, enemy, data) => {
 
 KDEventMapBuff.tickAfter[alchemistDommedFlag] = (e, buff, entity, data) => {
     if (buff.duration > 0 && entity.player) {
-        if (!KinkyDungeonInventoryGet("AlchemistPetLeash")) {
+        if (!KinkyDungeonInventoryGet(cRestraints.corruptedAlchemistLeash)) {
             KDBreakTether(entity);
             KinkyDungeonExpireBuff(entity, alchemistDommedFlag);
         }
@@ -425,20 +425,20 @@ KDUtilCommon.SetBuffText("staminaDrain", "Stamina Locked: Your stamina won't reg
 //#                              |_|                                         
 // ==========================================================================
 
+const corruptedMaidPetDress = "MaidPet";
 const corruptedMaidName = "CorruptedMaid";
 const corruptedMaidText = "Corrupted Maid";
 const corruptedMaidDomFlag = "CorruptedMaidDom";
 const dressingUpRestraint = "RopeSnakeHogtieWrist";
 let restraintsToAddMaid = [
     "CorruptedMaidLeatherHeels",
-    "CorruptedMaidDusterGag",
+    "DusterGag",
     "CorruptedMaidAnkleCuffs",
     "CorruptedMaidLegShackles",
     "CorruptedMaidElbowShackles",
     "CorruptedMaidBelt",
     "CorruptedMaidArmbinder",
-    "CorruptedMaidCollar",
-    "CorruptedMaidLeash",
+    "CorruptedMaidCollar"
 ];
 
 KDUtilCommon.KinkyDungeonCloneEnemy("Maidforce", corruptedMaidName, {
@@ -464,11 +464,11 @@ KDEventMapEnemy.beforeDamage.corruptedMaid = (e, enemy, data) => {
             if (KDUtilCommon.PlayerWearsRestraint(restraintName)) continue;
 
             const restraint = KinkyDungeonGetRestraintByName(restraintName);
-            if (!restraint) {
+            if (!restraint || !restraint.name) {
                 console.log("Corrupted maid couldn't find the restraint with name: ", restraintName);
                 continue;
             }
-            if (KinkyDungeonAddRestraintIfWeaker(restraint, 0, true, undefined, false, undefined, undefined, undefined, true)) {
+            if (KinkyDungeonAddRestraintIfWeaker(restraintName, 0, true, undefined, false, undefined, undefined, undefined, true)) {
                 restraintAdded = true;
                 break;
             }
@@ -483,7 +483,7 @@ KDEventMapEnemy.beforeDamage.corruptedMaid = (e, enemy, data) => {
                 ]
             };
 
-            if (KinkyDungeonCurrentDress !== petDressName) {
+            if (KinkyDungeonCurrentDress !== corruptedMaidPetDress) {
                 KinkyDungeonAddRestraintIfWeaker(KinkyDungeonGetRestraintByName(dressingUpRestraint), 0, true, undefined, false, undefined, undefined, "Corrupted", true);
                 KinkyDungeonSendTextMessage(1, `${corruptedMaidText} pushes you to ground and begins changing your outfit!`, "white", 3);
                 flagBuff.enemy = enemy;
@@ -508,12 +508,12 @@ KDEventMapBuff.tickAfter[corruptedMaidDomFlag] = (e, buff, entity, data) => {
         KinkyDungeonSetFlag("PlayerDommed", 2);
     } else if (buff.enemy) {
         KDBreakTether(entity);
-        KinkyDungeonSetDress(petDressName, petDressName);
-        if (!KinkyDungeonInventoryGet(petDressName)) {
-            let outfit = { name: petDressName, id: KinkyDungeonGetItemID(), type: "Outfit" };
+        KinkyDungeonSetDress(corruptedMaidPetDress, corruptedMaidPetDress);
+        if (!KinkyDungeonInventoryGet(corruptedMaidPetDress)) {
+            let outfit = { name: corruptedMaidPetDress, id: KinkyDungeonGetItemID(), type: "Outfit" };
             KinkyDungeonInventoryAdd(outfit);
         }
-        KinkyDungeonMapParams[KinkyDungeonMapIndex[MiniGameKinkyDungeonCheckpoint]].defeat_outfit = petDressName;
+        KinkyDungeonMapParams[KinkyDungeonMapIndex[MiniGameKinkyDungeonCheckpoint]].defeat_outfit = corruptedMaidPetDress;
         KinkyDungeonRemoveRestraintsWithName("RopeSnakeHogtieWrist");
         KinkyDungeonSendTextMessage(1, `${corruptedMaidText} has transformed your outfit! +(Corrupted Maid Pet Outfit)`, "white", 3);
         KinkyDungeonAttachTetherToEntity(2, buff.enemy);

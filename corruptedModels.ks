@@ -1,4 +1,21 @@
 const KDUtilCommon = window.KDUtilCommon;
+
+AddModel({
+    Name: "TransparentCatsuitCroppedLowRise",
+    TopLevel: false,
+    Parent: "TransparentCatsuit",
+    Categories: ["Suits"],
+    Folder: "Catsuit",
+    Filters: {
+        TorsoUpper: {"gamma": 1, "saturation": 1, "contrast": 1, "brightness": 1, "red": 1, "green": 1, "blue": 1, "alpha": 0.53},
+        TorsoLower: {"gamma": 1, "saturation": 1, "contrast": 1, "brightness": 1, "red": 1, "green": 1, "blue": 1, "alpha": 0.53},
+    },
+    Layers: ToLayerMap([
+        ...GetModelLayersNoOverride("CatsuitUpperCropped"),
+        ...GetModelLayersNoOverride("CatsuitLowerLowRise"),
+    ]),
+});
+
 AddModel({
     Name: "CorruptedMummyOrb",
     Folder: "Weapon",

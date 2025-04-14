@@ -21,14 +21,12 @@ const cRestraints = {
     corruptedCubeEncasement: "CorruptedCubeEncasement",
     // Maid
     corruptedMaidLeatherHeels: "CorruptedMaidLeatherHeels",
-    corruptedMaidDusterGag: "CorruptedMaidDusterGag",
     corruptedMaidAnkleCuffs: "CorruptedMaidAnkleCuffs",
     corruptedMaidLegShackles: "CorruptedMaidLegShackles",
     corruptedMaidElbowShackles: "CorruptedMaidElbowShackles",
     corruptedMaidBelt: "CorruptedMaidBelt",
     corruptedMaidArmbinder: "CorruptedMaidArmbinder",
     corruptedMaidCollar: "CorruptedMaidCollar",
-    corruptedMaidLeash: "CorruptedMaidLeash",
     // Alchemist
     corruptedAlchemistCorset: "CorruptedAlchemistPetCorset",
     corruptedAlchemistBallGag: "CorruptedAlchemistPetBallGag",
@@ -177,8 +175,8 @@ KDEventMapBuff.tickAfter["EpicenterEngulfed"] = (e, buff, entity, data) => {
 KinkyDungeonRestraints.push({
     inventory: true,
     name: cRestraints.corruptedAlchemistCorset,
-    Asset: "Corset",
-    Model: "Corset",
+    Asset: "LatexCorset",
+    Model: "LatexCorset",
     Color: "#8B53E9",
     Group: "ItemTorso",
     power: 4,
@@ -277,7 +275,6 @@ KinkyDungeonRestraints.push({
     shrine: ["Leather", "Armbinders"]
 }, {
     inventory: true,
-    debris: "Chains",
     faction: "Corrupted",
     name: cRestraints.corruptedAlchemistLeash,
     Asset: "BasicLeash",
@@ -329,27 +326,6 @@ KinkyDungeonRestraints.push({
     minLevel: 0,
     allFloors: true,
     shrine: ["Leather", "Heels"]
-}, {
-    inventory: true,
-    name: cRestraints.corruptedMaidDusterGag,
-    Asset: "FeatherDuster",
-    Model: "FeatherDusterGag",
-    Color: "#53428D",
-    Group: "ItemMouth",
-    power: 3,
-    weight: 0,
-    escapeChance: { "Struggle": -0.5, "Cut": -0.4, "Remove": 0.4, "Pick": 0.05 },
-    maxwill: 0.3,
-    Filters: {
-        Handle: { "gamma": 1, "saturation": 1, "contrast": 1, "brightness": 1.2, "red": 1.3, "green": 0.8, "blue": 2.0, "alpha": 1 },
-        Feathers: { "gamma": 1, "saturation": 1, "contrast": 1, "brightness": 1.2, "red": 1.0, "green": 1.0, "blue": 1.0, "alpha": 1 }
-    },
-    unlimited: true,
-    enemyTags: { "corruptedMaid": 5 },
-    playerTags: { "ItemMouthFull": -2 },
-    minLevel: 0,
-    allFloors: true,
-    shrine: ["Gags", "FlatGags"]
 }, {
     inventory: true,
     name: cRestraints.corruptedMaidAnkleCuffs,
@@ -470,29 +446,19 @@ KinkyDungeonRestraints.push({
     minLevel: 0,
     allFloors: true,
     shrine: ["Collars", "Leather"]
-}, {
-    inventory: true,
-    debris: "Chains",
-    faction: "Corrupted",
-    name: cRestraints.corruptedMaidLeash,
-    Asset: "BasicLeash",
-    Color: "#53428D",
-    Group: "ItemNeckRestraints",
-    Link: cRestraints.corruptedMaidCollar,
-    unLink: cRestraints.corruptedMaidCollar,
-    power: 7,
-    weight: 0,
-    escapeChance: { "Struggle": -0.1, "Cut": 0.1, "Remove": 0.2, "Pick": -0.3 },
-    enemyTags: { "corruptedMaid": 5 },
-    playerTags: {},
-    minLevel: 0,
-    allFloors: true,
-    shrine: [],
-    strictness: 0.05,
-    tether: 2,
-    events: [
-        { trigger: "tether", type: "enemyTether", msg: "The maid leash tightens!", color: "#53428D" }
-    ]
+}, {unlimited: true, inventory: true, name: "RopeSnakeHogtieWrist", debris: "Ropes", accessible: true, factionColor: [[], [0]], Asset: "HempRope", Type: "Hogtied", Color: "Default", Group: "ItemArms", bindarms: true, power: 6, weight: 0,
+    Model: "RopeWristtie1",
+    alwaysDressModel: [
+        {Model: "RopeChestStraps2", inheritFilters: true}
+    ],
+    linkCategory: "Hogtie", linkSize: 0.51,
+    LinkableBy: [...KDWrappable],
+    //renderWhenLinked: [...KDArmRopesRender],
+    alwaysRender: true,
+    struggleMult: {"Struggle": 0.4, "Remove": 0.3},
+    escapeChance: {"Struggle": 0.1, "Cut": 0.15, "Remove": -0.05}, affinity: {Remove: ["Hook"],},
+    maxwill: 0.25, enemyTags: {"ropeRestraintsHogtie":12}, playerTags: {}, minLevel: 2, allFloors: true, shrine: ["RopeSnake", "Rope", "Ties", "Hogties", "Wristties"],
+    //events: [{trigger: "postRemoval", type: "replaceItem", list: ["RopeSnakeArmsWrist"], power: 6}]
 });
 
 // ============================================================================================
@@ -910,9 +876,6 @@ KinkyDungeonAddRestraintText(cRestraints.corruptedCubeEncasement, "Corrupted Cub
 KinkyDungeonAddRestraintText(cRestraints.corruptedMaidLeatherHeels, "Corrupted Maid Leather Heels",
     "Shiny leather heels force your feet high, swaying your hips for all to see.",
     "Each click on the floor is a humiliating song of your servitude.");
-KinkyDungeonAddRestraintText(cRestraints.corruptedMaidDusterGag, "Corrupted Maid Duster Gag",
-    "A feather duster gags your mouth, tickling your lips with every breath.",
-    "It’s strapped tight, turning your pleas into a dusty whimper.");
 KinkyDungeonAddRestraintText(cRestraints.corruptedMaidAnkleCuffs, "Corrupted Maid Ankle Cuffs",
     "Leather cuffs chain your ankles, demanding dainty, obedient steps.",
     "The short chain jingles, a constant tease of your bondage.");
@@ -934,9 +897,6 @@ KinkyDungeonAddRestraintText(cRestraints.corruptedMaidVibe, "Corrupted Maid Vibr
 KinkyDungeonAddRestraintText(cRestraints.corruptedMaidCollar, "Corrupted Maid Collar",
     "A collar brands you ‘Property of the Maid,’ locked forever.",
     "It sits heavy, a proud mark of your servitude.");
-KinkyDungeonAddRestraintText(cRestraints.corruptedMaidLeash, "Corrupted Maid Leash",
-    "A leash clips to your collar, dragging you like a naughty pet.",
-    "Every tug reminds you—you’re owned, body and soul.");
 
 // Alchemist
 KinkyDungeonAddRestraintText(cRestraints.corruptedAlchemistCorset, "Corrupted Alchemist Pet Corset",
