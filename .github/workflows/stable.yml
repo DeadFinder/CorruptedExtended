@@ -47,6 +47,25 @@ jobs:
           echo "TAG_EXISTS=false" >> $GITHUB_ENV
         fi
 
+    - name: Import GPG key
+      if: env.TAG_EXISTS == 'false'
+      env:
+        GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
+        GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
+      run: |
+        echo "$GPG_PRIVATE_KEY" | gpg --batch --import
+        echo "$GPG_PASSPHRASE" | gpg --batch --passphrase-fd 0 --pinentry-mode loopback --list-secret-keys
+
+    - name: Create and push signed tag
+      if: env.TAG_EXISTS == 'false'
+      run: |
+        git config user.name "GitHub Actions"
+        git config user.email "actions@github.com"
+        git config user.signingkey ${{ secrets.GPG_KEY_ID }}
+        git tag -s Stable_${{ env.VERSION }} -m "Release Stable_${{ env.VERSION }}"
+        echo "Pushing tag Stable_${{ env.VERSION }}"
+        git push origin Stable_${{ env.VERSION }} || { echo "Failed to push tag"; exit 1; }
+
     - name: Create ZIP archive
       if: env.TAG_EXISTS == 'false'
       run: |
@@ -58,7 +77,7 @@ jobs:
       if: env.TAG_EXISTS == 'false'
       uses: actions/create-release@v1
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GPG_TOKEN }}
       with:
         tag_name: Stable_${{ env.VERSION }}
         release_name: Stable v${{ env.VERSION }}
@@ -69,7 +88,7 @@ jobs:
       if: env.TAG_EXISTS == 'false'
       uses: actions/upload-release-asset@v1
       env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GPG_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ./${{ env.MODNAME }}_${{ env.VERSION }}.zip
