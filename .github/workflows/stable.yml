@@ -70,8 +70,8 @@ jobs:
         GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
         GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
       run: |
-        git config user.name "Sergey"
-        git config user.email "mrgameonline_cheat@bk.ru"
+        git config user.name "${{ secrets.GIT_USER_NAME }}"
+        git config user.email "${{ secrets.GIT_USER_EMAIL }}"
         git config user.signingkey "$GPG_KEY_ID"
         git config gpg.program gpg
         echo "Creating signed tag Stable_${{ env.VERSION }}"
