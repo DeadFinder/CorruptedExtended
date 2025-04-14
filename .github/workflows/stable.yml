@@ -15,7 +15,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
-        fetch-depth: 0
+        fetch-depth: 0  # Полная история для работы с тегами
 
     - name: Install jq
       run: sudo apt-get update && sudo apt-get install -y jq
@@ -41,20 +41,11 @@ jobs:
       id: check_tag
       run: |
         if git rev-parse "Stable_${{ env.VERSION }}" >/dev/null 2>&1; then
-          echo "Tag Stable_${{ env.VERSION }} already exists, skipping tag creation."
+          echo "Tag Stable_${{ env.VERSION }} already exists, skipping release creation."
           echo "TAG_EXISTS=true" >> $GITHUB_ENV
         else
           echo "TAG_EXISTS=false" >> $GITHUB_ENV
         fi
-
-    - name: Create and push tag
-      if: env.TAG_EXISTS == 'false'
-      run: |
-        git config user.name "GitHub Actions"
-        git config user.email "actions@github.com"
-        git tag Stable_${{ env.VERSION }}
-        echo "Pushing tag Stable_${{ env.VERSION }}"
-        git push origin Stable_${{ env.VERSION }} || { echo "Failed to push tag"; exit 1; }
 
     - name: Create ZIP archive
       if: env.TAG_EXISTS == 'false'
