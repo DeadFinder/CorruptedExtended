@@ -8,14 +8,14 @@ on:
       - 'mod.json'
 
 jobs:
-  stable:
+  debug:
     runs-on: ubuntu-latest
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
       with:
-        fetch-depth: 0
+        fetch-depth: 0  # Полная история для работы с тегами
 
     - name: Install jq
       run: sudo apt-get update && sudo apt-get install -y jq
@@ -41,20 +41,11 @@ jobs:
       id: check_tag
       run: |
         if git rev-parse "Debug_${{ env.VERSION }}" >/dev/null 2>&1; then
-          echo "Tag Debug_${{ env.VERSION }} already exists, skipping tag creation."
+          echo "Tag Debug_${{ env.VERSION }} already exists, skipping release creation."
           echo "TAG_EXISTS=true" >> $GITHUB_ENV
         else
           echo "TAG_EXISTS=false" >> $GITHUB_ENV
         fi
-
-    - name: Create and push tag
-      if: env.TAG_EXISTS == 'false'
-      run: |
-        git config user.name "GitHub Actions"
-        git config user.email "actions@github.com"
-        git tag Debug_${{ env.VERSION }}
-        echo "Pushing tag Debug_${{ env.VERSION }}"
-        git push origin Debug_${{ env.VERSION }} || { echo "Failed to push tag"; exit 1; }
 
     - name: Create ZIP archive
       if: env.TAG_EXISTS == 'false'
@@ -62,7 +53,7 @@ jobs:
         echo "Creating ZIP archive: ${{ env.MODNAME }}_${{ env.VERSION }}.zip"
         git archive --format=zip --output=${{ env.MODNAME }}_${{ env.VERSION }}.zip HEAD
 
-    - name: Create Debug
+    - name: Create Debug Release
       id: create_debug
       if: env.TAG_EXISTS == 'false'
       uses: actions/create-release@v1
@@ -74,13 +65,13 @@ jobs:
         draft: false
         prerelease: true
 
-    - name: Upload ZIP to Debug
+    - name: Upload ZIP to Debug Release
       if: env.TAG_EXISTS == 'false'
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        upload_url: ${{ steps.create_debug.outputs.upload_url }}
         asset_path: ./${{ env.MODNAME }}_${{ env.VERSION }}.zip
         asset_name: ${{ env.MODNAME }}_${{ env.VERSION }}.zip
         asset_content_type: application/zip
