@@ -17,8 +17,8 @@ jobs:
       with:
         fetch-depth: 0  # Полная история для работы с тегами
 
-    - name: Install jq
-      run: sudo apt-get update && sudo apt-get install -y jq
+    - name: Install jq and gnupg
+      run: sudo apt-get update && sudo apt-get install -y jq gnupg
 
     - name: Read version and modname from mod.json
       id: get_mod_info
@@ -53,16 +53,30 @@ jobs:
         GPG_PRIVATE_KEY: ${{ secrets.GPG_PRIVATE_KEY }}
         GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
       run: |
-        echo "$GPG_PRIVATE_KEY" | gpg --batch --import
-        echo "$GPG_PASSPHRASE" | gpg --batch --passphrase-fd 0 --pinentry-mode loopback --list-secret-keys
+        echo "Importing GPG key..."
+        echo "$GPG_PRIVATE_KEY" | gpg --batch --yes --no-tty --passphrase "$GPG_PASSPHRASE" --import || { echo "Failed to import GPG key"; exit 1; }
+        echo "Listing imported keys..."
+        gpg --list-secret-keys --keyid-format=long
+
+    - name: Configure GPG for non-interactive signing
+      if: env.TAG_EXISTS == 'false'
+      run: |
+        echo "no-tty" > ~/.gnupg/gpg.conf
+        echo "pinentry-mode loopback" > ~/.gnupg/gpg-agent.conf
 
     - name: Create and push signed tag
       if: env.TAG_EXISTS == 'false'
+      env:
+        GPG_KEY_ID: ${{ secrets.GPG_KEY_ID }}
+        GPG_PASSPHRASE: ${{ secrets.GPG_PASSPHRASE }}
       run: |
         git config user.name "GitHub Actions"
         git config user.email "actions@github.com"
-        git config user.signingkey ${{ secrets.GPG_KEY_ID }}
-        git tag -s Stable_${{ env.VERSION }} -m "Release Stable_${{ env.VERSION }}"
+        git config user.signingkey "$GPG_KEY_ID"
+        git config gpg.program gpg
+        echo "Creating signed tag Stable_${{ env.VERSION }}"
+        echo "$GPG_PASSPHRASE" | gpg --batch --yes --no-tty --passphrase-fd 0 --pinentry-mode loopback --sign -o /dev/null /dev/null || { echo "GPG test sign failed"; exit 1; }
+        git tag -s Stable_${{ env.VERSION }} -m "Release Stable_${{ env.VERSION }}" || { echo "Failed to create signed tag"; exit 1; }
         echo "Pushing tag Stable_${{ env.VERSION }}"
         git push origin Stable_${{ env.VERSION }} || { echo "Failed to push tag"; exit 1; }
 
@@ -77,7 +91,7 @@ jobs:
       if: env.TAG_EXISTS == 'false'
       uses: actions/create-release@v1
       env:
-        GITHUB_TOKEN: ${{ secrets.GPG_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         tag_name: Stable_${{ env.VERSION }}
         release_name: Stable v${{ env.VERSION }}
@@ -88,7 +102,7 @@ jobs:
       if: env.TAG_EXISTS == 'false'
       uses: actions/upload-release-asset@v1
       env:
-        GITHUB_TOKEN: ${{ secrets.GPG_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
         asset_path: ./${{ env.MODNAME }}_${{ env.VERSION }}.zip
