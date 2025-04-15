@@ -105,7 +105,6 @@ let KDDrawTooltipOriginal = KDDrawTooltip;
 KDDrawTooltip = function KDDrawTooltip(TooltipList, ...args) {
     let enemy = KDCurrentEnemyTooltip;
     if (enemy && KDCanSeeEnemy(enemy) && enemy.idle && (enemy.Enemy?.name == "CorruptedMimic" || enemy.Enemy?.name == "Mimic")) {
-        console.log(enemy)
         TooltipList = [];
     }
     return KDDrawTooltipOriginal(TooltipList, ...args);

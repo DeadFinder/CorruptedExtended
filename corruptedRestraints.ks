@@ -751,6 +751,13 @@ KDEventMapInventory.postRemoval.corruptedCubeRequireEncasement = (e, item, data)
             }
         }
         KinkyDungeonExpireBuff(KinkyDungeonPlayerEntity, "CubeEngulfed");
+        DialogueCreateEnemy(KinkyDungeonPlayerEntity.x, KinkyDungeonPlayerEntity.y, "CorruptedLatexCube");
+        KDNearbyEnemies(KinkyDungeonPlayerEntity.x, KinkyDungeonPlayerEntity.y, 3).forEach(enemy => {
+            if (enemy.Enemy.name == "CorruptedLatexCube") {
+                enemy.hp = 10;
+                enemy.stun = 5;
+            }
+        });
     }
 };
 
@@ -779,11 +786,10 @@ KDEventMapBuff.tickAfter["CubeEngulfed"] = (e, buff, entity, data) => {
                 }
         } else {
             KinkyDungeonExpireBuff(KinkyDungeonPlayerEntity, "CubeEngulfed");
-            DialogueCreateEnemy(KinkyDungeonPlayerEntity.x, KinkyDungeonPlayerEntity.y, corruptedCube);
+            DialogueCreateEnemy(KinkyDungeonPlayerEntity.x, KinkyDungeonPlayerEntity.y, "CorruptedLatexCube");
             KDNearbyEnemies(KinkyDungeonPlayerEntity.x, KinkyDungeonPlayerEntity.y, 3).forEach(enemy => {
-                if (enemy.Enemy.name == corruptedCube) {
-                    enemy.hp = 10;
-                    enemy.stun = 5;
+                if (enemy.Enemy.name == "CorruptedLatexCube") {
+                    enemy.stun = 3;
                 }
             });
             KinkyDungeonSendTextMessage(4, "The cube not interested in you more and you are free for now..", "lightgreen", 2);
