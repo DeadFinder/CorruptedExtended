@@ -26,7 +26,7 @@ const corruptedMimicName = "CorruptedMimic";
 const corruptedMimicText = "Corrupted Mimic";
 
 KinkyDungeonEnemies.push({
-    name: corruptedMimicName, faction: "CorruptedHidden", blockVisionWhileStationary: true, tags: KDMapInit(["removeDoorSpawn", "ignoreharmless", "blindresist", "construct", "nosignal", "poisonresist", "soulresist", "minor", "melee", "crushweakness", "meleeresist", "fireweakness", "electricresist", "chainweakness"]),
+    name: corruptedMimicName, faction: "CorruptedHidden", blockVisionWhileStationary: true, tags: KDMapInit(["removeDoorSpawn", "blindresist", "construct", "nosignal", "poisonresist", "soulresist", "minor", "melee", "crushweakness", "meleeresist", "fireweakness", "electricresist", "chainweakness"]),
     evasion: -0.5, ignorechance: 1.0, armor: 1, followRange: 1, AI: "ambush", bypass: true, difficulty: 0.15, guardChance: 0,
     nonDirectional: true,
     //useLock: "White",
@@ -50,11 +50,12 @@ KinkyDungeonEnemies.push({
 });
 
 KDEventMapEnemy.beforeDamage.corruptedMimic = (e, enemy, data) => {
-    if (data.enemy === enemy && data.target === KinkyDungeonPlayerEntity && !data.restrainsAdded) {
+    if (data.enemy === enemy && data.target === KinkyDungeonPlayerEntity) {
         const corruptedRestraints = [cRestraints.corruptedMummyHardSlimeFeet, cRestraints.corruptedMummyHardSlimeBoots, cRestraints.corruptedMummyHardSlimeLegs, cRestraints.corruptedMummyHardSlimeArms, cRestraints.corruptedMummyHardSlimeHands, cRestraints.corruptedMummyHardSlimeMouth, cRestraints.corruptedMummyHardSlimeHead];
         const equippedRestraints = KinkyDungeonAllRestraint().map(inv => inv.name);
         if (KDRandom() >= 0.9) {
-            if (enemy.hp <= 10) {
+            console.log(`${enemy.hp} <= ${enemy.Enemy.maxhp} / 2`);
+            if (enemy.hp <= enemy.Enemy.maxhp / 2) {
                 return;
             }
             KDBreakTether(KinkyDungeonPlayerEntity);
